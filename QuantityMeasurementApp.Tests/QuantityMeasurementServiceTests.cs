@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Models;
 using QuantityMeasurementApp.Services;
 
+
 namespace QuantityMeasurementApp.Tests
 {
     [TestClass]
@@ -17,6 +18,7 @@ namespace QuantityMeasurementApp.Tests
         }
 
         // Test: 1.0 ft == 1.0 ft
+        // -------- UC1 : Feet Tests --------
         [TestMethod]
         public void testEquality_SameValue()
         {
@@ -68,6 +70,66 @@ namespace QuantityMeasurementApp.Tests
         public void testEquality_SameReference()
         {
             Feet first = new Feet(1.0);
+
+            bool result = _service.AreEqual(first, first);
+
+            Assert.IsTrue(result, "Object should be equal to itself");
+        }
+
+        // -------- UC2 : Inches Tests --------
+
+        // Same value inches
+        [TestMethod]
+        public void testInchesEquality_SameValue()
+        {
+            Inches first = new Inches(1.0);
+            Inches second = new Inches(1.0);
+
+            bool result = _service.AreEqual(first, second);
+
+            Assert.IsTrue(result, "1.0 inch should be equal to 1.0 inch");
+        }
+
+        // Different value inches
+        [TestMethod]
+        public void testInchesEquality_DifferentValue()
+        {
+            Inches first = new Inches(1.0);
+            Inches second = new Inches(2.0);
+
+            bool result = _service.AreEqual(first, second);
+
+            Assert.IsFalse(result, "1.0 inch should NOT equal 2.0 inch");
+        }
+
+        // Null comparison inches
+        [TestMethod]
+        public void testInchesEquality_NullComparison()
+        {
+            Inches first = new Inches(1.0);
+
+            bool result = _service.AreEqual(first, null);
+
+            Assert.IsFalse(result, "Inches should not be equal to null");
+        }
+
+        // Non numeric input inches
+        [TestMethod]
+        public void testInchesEquality_NonNumericInput()
+        {
+            Inches first = _service.CreateInches("1.0");
+            Inches second = _service.CreateInches("abc");
+
+            bool result = _service.AreEqual(first, second);
+
+            Assert.IsFalse(result, "Non numeric inch input should return false");
+        }
+
+        // Same reference inches
+        [TestMethod]
+        public void testInchesEquality_SameReference()
+        {
+            Inches first = new Inches(1.0);
 
             bool result = _service.AreEqual(first, first);
 

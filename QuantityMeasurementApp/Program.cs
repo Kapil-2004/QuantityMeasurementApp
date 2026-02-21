@@ -10,6 +10,7 @@ namespace QuantityMeasurementApp
         {
             QuantityMeasurementService service = new QuantityMeasurementService();
 
+            // --- UC1 Feet Equality Check ---
             Console.WriteLine("Enter first value in feet:");
             string input1 = Console.ReadLine();
 
@@ -31,6 +32,27 @@ namespace QuantityMeasurementApp
             bool result = service.AreEqual(feet1, feet2);
 
             Console.WriteLine($"Equal ({result})");
+
+            // --- UC2 Inches Equality Check ---
+            Console.WriteLine("Enter first value in inches:");
+            string inchInput1 = Console.ReadLine();
+
+            Console.WriteLine("Enter second value in inches:");
+            string inchInput2 = Console.ReadLine();
+
+            // Create Inches objects
+            Inches inch1 = service.CreateInches(inchInput1);
+            Inches inch2 = service.CreateInches(inchInput2);
+
+            if (inch1 == null || inch2 == null)
+            {
+                Console.WriteLine("Invalid inch input.");
+            }
+            else
+            {
+                bool inchResult = service.AreEqual(inch1, inch2);
+                Console.WriteLine($"Inches Equal ({inchResult})");
+            }
         }
     }
 }

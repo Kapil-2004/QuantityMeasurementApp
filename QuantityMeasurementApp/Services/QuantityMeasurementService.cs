@@ -24,5 +24,24 @@ namespace QuantityMeasurementApp.Services
 
             return new Feet(value);
         }
+
+        // Compare two Inches objects
+        public bool AreEqual(Inches first, Inches second)
+        {
+            // Null safety
+            if (first == null || second == null)
+                return false;
+
+            return first.Equals(second);
+        }
+
+        // Create Inches object safely from string
+        public Inches CreateInches(string input)
+        {
+            if (!double.TryParse(input, out double value))
+                return null;
+
+            return new Inches(value);
+        }
     }
 }
