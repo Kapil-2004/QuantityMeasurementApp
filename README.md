@@ -1,23 +1,60 @@
-# 📏 Quantity Measurement Application
+# 📏 UC2 – Inch Equality Implementation
 
-> A clean and scalable .NET application for validating quantity measurements using value-based equality.
+## 📌 Overview
+UC2 extends the Quantity Measurement application by introducing an **Inch** class that supports value-based equality comparison.
 
----
-
-## 🚀 Use Case 1 – Feet Measurement Equality
-
-### 📌 Overview
-
-UC1 verifies whether **two measurements in feet are equal** using proper object-oriented principles and floating-point comparison best practices.
-
-The system ensures:
-
-- ✔ Value-based equality  
-- ✔ Floating-point precision handling  
-- ✔ Null safety  
-- ✔ Type safety  
-- ✔ Clean layered architecture  
-- ✔ Full MSTest coverage  
+This use case ensures that two measurements in inches can be compared correctly using an overridden `Equals()` method while maintaining Object-Oriented principles.
 
 ---
 
+## 🎯 Objective
+- Implement equality comparison for inch measurements
+- Follow value-based equality
+- Maintain compatibility with UC1 (Feet implementation)
+- Ensure null safety and type safety
+
+---
+
+## 🛠 Implementation Details
+- Created `Inch` class
+- Added constructor with validation
+- Overridden:
+  - `Equals()` method
+  - `GetHashCode()` method
+- Added service method for comparison
+- Implemented unit test cases
+
+---
+
+## ✅ Functionality
+
+| Comparison | Result |
+|------------|--------|
+| Inch(1.0) == Inch(1.0) | true |
+| Inch(1.0) == Inch(2.0) | false |
+| Inch(1.0) == null | false |
+
+---
+
+## 🧪 Test Cases Covered
+- Same value equality
+- Different value inequality
+- Null comparison
+- Same reference comparison
+- Type safety validation
+
+---
+
+## 📚 Concepts Applied
+- Value-Based Equality
+- Equality Contract (Reflexive, Symmetric, Transitive, Consistent)
+- Null Safety
+- Method Overriding
+- Object-Oriented Design Principles
+
+---
+
+## 🔒 Postconditions
+- Accurate inch-to-inch comparison
+- All UC1 functionality remains unchanged
+- Code is validated through unit testing
