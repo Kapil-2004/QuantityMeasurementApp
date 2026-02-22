@@ -89,18 +89,18 @@ namespace QuantityMeasurementApp
                 Console.WriteLine("Select Unit:");
                 Console.WriteLine("1. Feet");
                 Console.WriteLine("2. Inch");
+                Console.WriteLine("3. Yard");
+                Console.WriteLine("4. Centimeter");
                 Console.Write("Choice: ");
 
                 string input = Console.ReadLine();
 
                 switch (input)
                 {
-                    case "1":
-                        return LengthUnit.Feet;
-
-                    case "2":
-                        return LengthUnit.Inch;
-
+                    case "1": return LengthUnit.Feet;
+                    case "2": return LengthUnit.Inch;
+                    case "3": return LengthUnit.Yard;
+                    case "4": return LengthUnit.Centimeter;
                     default:
                         Console.WriteLine("Invalid unit selection. Try again.");
                         break;

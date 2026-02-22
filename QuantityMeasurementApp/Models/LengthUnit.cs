@@ -6,7 +6,9 @@ namespace QuantityMeasurementApp.Models
     public enum LengthUnit
     {
         Feet,
-        Inch
+        Inch,
+        Yard,
+        Centimeter
     }
 
     // Extension class to provide conversion logic for each unit
@@ -17,8 +19,10 @@ namespace QuantityMeasurementApp.Models
         {
             return unit switch
             {
-                LengthUnit.Feet => 1.0,          // 1 Foot = 1 Foot
-                LengthUnit.Inch => 1.0 / 12.0,   // 12 Inches = 1 Foot
+                LengthUnit.Feet => 1.0,                   // Base unit
+                LengthUnit.Inch => 1.0 / 12.0,            // 12 Inches = 1 Foot
+                LengthUnit.Yard => 3.0,                   // 1 Yard = 3 Feet
+                LengthUnit.Centimeter => 0.0328084167,    // 1 cm = 0.0328084167 Feet
                 _ => throw new ArgumentException("Unsupported unit")
             };
         }

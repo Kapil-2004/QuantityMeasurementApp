@@ -3,44 +3,38 @@ using System;
 namespace QuantityMeasurementApp.Models
 {
     // Generic class representing a length measurement
-    // Combines value and unit to eliminate duplication (DRY principle)
+    // Combines value and unit (DRY compliant design)
     public class QuantityLength
     {
-        // Numeric measurement value
-        public double Value { get; }
+        private const double TOLERANCE = 0.0001;
 
-        // Unit of the measurement (Feet or Inch)
+        public double Value { get; }
         public LengthUnit Unit { get; }
 
-        // Constructor initializes value and unit
         public QuantityLength(double value, LengthUnit unit)
         {
             Value = value;
             Unit = unit;
         }
 
-        // Converts current quantity to base unit (Feet)
-        // Ensures consistent comparison between different units
+        // Converts quantity into base unit (Feet)
         private double ConvertToFeet()
         {
             return Value * Unit.ToFeetFactor();
         }
 
-        // Overrides Equals to implement value-based equality
-        // Supports cross-unit comparison (e.g., 1 ft == 12 in)
+        // Implements value-based equality with tolerance
         public override bool Equals(object obj)
         {
-            // Return false if object is null or not same type
             if (obj == null || GetType() != obj.GetType())
                 return false;
 
             QuantityLength other = (QuantityLength)obj;
 
-            // Compare converted values in base unit (Feet)
-            return ConvertToFeet().Equals(other.ConvertToFeet());
+            return Math.Abs(ConvertToFeet() - other.ConvertToFeet()) < TOLERANCE;
         }
 
-        // Overrides GetHashCode to maintain equality contract consistency
+        // Maintains equality contract
         public override int GetHashCode()
         {
             return ConvertToFeet().GetHashCode();
