@@ -1,60 +1,32 @@
-# 📏 UC2 – Inch Equality Implementation
+# 📏 UC3 – Generic QuantityLength (DRY Implementation)
 
 ## 📌 Overview
-UC2 extends the Quantity Measurement application by introducing an **Inch** class that supports value-based equality comparison.
+UC3 introduces a single **QuantityLength** class to eliminate duplication between Feet and Inch implementations from UC1 and UC2.
 
-This use case ensures that two measurements in inches can be compared correctly using an overridden `Equals()` method while maintaining Object-Oriented principles.
-
----
-
-## 🎯 Objective
-- Implement equality comparison for inch measurements
-- Follow value-based equality
-- Maintain compatibility with UC1 (Feet implementation)
-- Ensure null safety and type safety
+It applies the **DRY principle** while preserving all existing functionality.
 
 ---
 
-## 🛠 Implementation Details
-- Created `Inch` class
-- Added constructor with validation
-- Overridden:
-  - `Equals()` method
-  - `GetHashCode()` method
-- Added service method for comparison
-- Implemented unit test cases
+## 🎯 Key Features
+- Single reusable `QuantityLength` model
+- `LengthUnit` enum for type-safe unit handling
+- Base unit conversion (Feet)
+- Cross-unit equality support (1 ft == 12 in)
+- Backward compatibility with UC1 & UC2
 
 ---
 
-## ✅ Functionality
-
-| Comparison | Result |
-|------------|--------|
-| Inch(1.0) == Inch(1.0) | true |
-| Inch(1.0) == Inch(2.0) | false |
-| Inch(1.0) == null | false |
-
----
-
-## 🧪 Test Cases Covered
-- Same value equality
-- Different value inequality
-- Null comparison
-- Same reference comparison
-- Type safety validation
+## 🧪 Test Coverage
+- Feet-to-Feet equality
+- Inch-to-Inch equality
+- Feet-to-Inch equivalence
+- Different value comparison
+- Null and same reference checks
 
 ---
 
-## 📚 Concepts Applied
-- Value-Based Equality
-- Equality Contract (Reflexive, Symmetric, Transitive, Consistent)
-- Null Safety
-- Method Overriding
-- Object-Oriented Design Principles
-
----
-
-## 🔒 Postconditions
-- Accurate inch-to-inch comparison
-- All UC1 functionality remains unchanged
-- Code is validated through unit testing
+## ✅ Outcome
+- Code duplication removed
+- Scalable design for adding new units
+- Clean Models + Services architecture
+- Equality contract fully maintained

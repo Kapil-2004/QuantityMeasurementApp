@@ -4,54 +4,107 @@ using QuantityMeasurementApp.Services;
 
 namespace QuantityMeasurementApp
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            QuantityMeasurementService service = new QuantityMeasurementService();
+            QuantityLengthService service = new QuantityLengthService();
 
-            // --- UC1 Feet Equality Check ---
-            Console.WriteLine("Enter first value in feet:");
-            string input1 = Console.ReadLine();
-
-            Console.WriteLine("Enter second value in feet:");
-            string input2 = Console.ReadLine();
-
-            // Convert inputs to Feet objects
-            Feet feet1 = service.CreateFeet(input1);
-            Feet feet2 = service.CreateFeet(input2);
-
-            // Validate numeric input
-            if (feet1 == null || feet2 == null)
+            while (true)
             {
-                Console.WriteLine("Invalid numeric input.");
-                return;
+                Console.Clear();
+                Console.WriteLine("=================================");
+                Console.WriteLine("  Quantity Measurement - UC3");
+                Console.WriteLine("=================================");
+                Console.WriteLine("1. Compare Two Lengths");
+                Console.WriteLine("2. Exit");
+                Console.Write("Select an option: ");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        CompareLengths(service);
+                        break;
+
+                    case "2":
+                        Console.WriteLine("Exiting application...");
+                        return;
+
+                    default:
+                        Console.WriteLine("Invalid choice. Press any key...");
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
+        // Handles user input and comparison logic
+        private static void CompareLengths(QuantityLengthService service)
+        {
+            try
+            {
+                Console.WriteLine("\nEnter First Quantity:");
+                double value1 = ReadDouble("Value: ");
+                LengthUnit unit1 = ReadUnit();
+
+                Console.WriteLine("\nEnter Second Quantity:");
+                double value2 = ReadDouble("Value: ");
+                LengthUnit unit2 = ReadUnit();
+
+                bool result = service.AreEqual(value1, unit1, value2, unit2);
+
+                Console.WriteLine("\n---------------------------------");
+                Console.WriteLine($"Result: {(result ? "Equal (True)" : "Not Equal (False)")}");
+                Console.WriteLine("---------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
 
-            // Compare values
-            bool result = service.AreEqual(feet1, feet2);
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
 
-            Console.WriteLine($"Equal ({result})");
-
-            // --- UC2 Inches Equality Check ---
-            Console.WriteLine("Enter first value in inches:");
-            string inchInput1 = Console.ReadLine();
-
-            Console.WriteLine("Enter second value in inches:");
-            string inchInput2 = Console.ReadLine();
-
-            // Create Inches objects
-            Inches inch1 = service.CreateInches(inchInput1);
-            Inches inch2 = service.CreateInches(inchInput2);
-
-            if (inch1 == null || inch2 == null)
+        // Reads and validates numeric input
+        private static double ReadDouble(string message)
+        {
+            while (true)
             {
-                Console.WriteLine("Invalid inch input.");
+                Console.Write(message);
+                if (double.TryParse(Console.ReadLine(), out double value))
+                    return value;
+
+                Console.WriteLine("Invalid number. Please try again.");
             }
-            else
+        }
+
+        // Reads and validates unit input
+        private static LengthUnit ReadUnit()
+        {
+            while (true)
             {
-                bool inchResult = service.AreEqual(inch1, inch2);
-                Console.WriteLine($"Inches Equal ({inchResult})");
+                Console.WriteLine("Select Unit:");
+                Console.WriteLine("1. Feet");
+                Console.WriteLine("2. Inch");
+                Console.Write("Choice: ");
+
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        return LengthUnit.Feet;
+
+                    case "2":
+                        return LengthUnit.Inch;
+
+                    default:
+                        Console.WriteLine("Invalid unit selection. Try again.");
+                        break;
+                }
             }
         }
     }
