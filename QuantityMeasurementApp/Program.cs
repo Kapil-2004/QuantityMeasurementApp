@@ -14,11 +14,12 @@ namespace QuantityMeasurementApp
             {
                 Console.Clear();
                 Console.WriteLine("=================================");
-                Console.WriteLine("  Quantity Measurement - UC5");
+                Console.WriteLine("  Quantity Measurement - UC6");
                 Console.WriteLine("=================================");
                 Console.WriteLine("1. Compare Two Lengths");
                 Console.WriteLine("2. Convert Length");
-                Console.WriteLine("3. Exit");
+                Console.WriteLine("3. Add Two Lengths");
+                Console.WriteLine("4. Exit");
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
@@ -34,6 +35,10 @@ namespace QuantityMeasurementApp
                         break;
 
                     case "3":
+                        AddLengths(service);
+                        break;
+
+                    case "4":
                         Console.WriteLine("Exiting application...");
                         return;
 
@@ -45,7 +50,7 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // Compare two quantities
+        // UC1–UC4: Compare two quantities
         private static void CompareLengths(QuantityLengthService service)
         {
             try
@@ -69,11 +74,10 @@ namespace QuantityMeasurementApp
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
+            Pause();
         }
 
-        // Convert one quantity to another unit (UC5)
+        // UC5: Convert length
         private static void ConvertLength(QuantityLengthService service)
         {
             try
@@ -96,11 +100,41 @@ namespace QuantityMeasurementApp
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
+            Pause();
+        }
+
+        // ============================================================
+        // UC6 - Add Two Lengths
+        // ============================================================
+
+        private static void AddLengths(QuantityLengthService service)
+        {
+            try
+            {
+                Console.WriteLine("\nEnter First Quantity:");
+                double value1 = ReadDouble("Value: ");
+                LengthUnit unit1 = ReadUnit();
+
+                Console.WriteLine("\nEnter Second Quantity:");
+                double value2 = ReadDouble("Value: ");
+                LengthUnit unit2 = ReadUnit();
+
+                QuantityLength result = service.Add(value1, unit1, value2, unit2);
+
+                Console.WriteLine("\n---------------------------------");
+                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
+                Console.WriteLine("---------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
 
-        // Read numeric input
+        // Read numeric input safely
         private static double ReadDouble(string message)
         {
             while (true)
@@ -113,7 +147,7 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // Read unit input
+        // Read unit selection
         private static LengthUnit ReadUnit()
         {
             while (true)
@@ -138,6 +172,12 @@ namespace QuantityMeasurementApp
                         break;
                 }
             }
+        }
+
+        private static void Pause()
+        {
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
     }
 }
