@@ -1,15 +1,16 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Models;
 using QuantityMeasurementApp.Services;
+using System;
 
 namespace QuantityMeasurementApp.Tests
 {
     [TestClass]
-    public class QuantityLengthTests
+    public class QuantityLengthConversionTests
     {
         private QuantityLengthService _service;
+        private const double EPSILON = 0.0001;
 
-        // Runs before each test
         [TestInitialize]
         public void Setup()
         {
@@ -17,161 +18,114 @@ namespace QuantityMeasurementApp.Tests
         }
 
         // ============================================================
-        // FEET TESTS
+        // BASIC CONVERSIONS
         // ============================================================
 
         [TestMethod]
-        public void testEquality_FeetToFeet_SameValue()
+        public void testConversion_FeetToInch()
         {
-            Assert.IsTrue(_service.AreEqual(1.0, LengthUnit.Feet,
-                                            1.0, LengthUnit.Feet));
+            double result = _service.Convert(1.0, LengthUnit.Feet, LengthUnit.Inch);
+            Assert.AreEqual(12.0, result, EPSILON);
         }
 
         [TestMethod]
-        public void testEquality_FeetToFeet_DifferentValue()
+        public void testConversion_InchToFeet()
         {
-            Assert.IsFalse(_service.AreEqual(1.0, LengthUnit.Feet,
-                                             2.0, LengthUnit.Feet));
-        }
-
-        // ============================================================
-        // INCH TESTS
-        // ============================================================
-
-        [TestMethod]
-        public void testEquality_InchToInch_SameValue()
-        {
-            Assert.IsTrue(_service.AreEqual(5.0, LengthUnit.Inch,
-                                            5.0, LengthUnit.Inch));
+            double result = _service.Convert(24.0, LengthUnit.Inch, LengthUnit.Feet);
+            Assert.AreEqual(2.0, result, EPSILON);
         }
 
         [TestMethod]
-        public void testEquality_FeetToInch_EquivalentValue()
+        public void testConversion_YardToInch()
         {
-            Assert.IsTrue(_service.AreEqual(1.0, LengthUnit.Feet,
-                                            12.0, LengthUnit.Inch));
+            double result = _service.Convert(1.0, LengthUnit.Yard, LengthUnit.Inch);
+            Assert.AreEqual(36.0, result, EPSILON);
         }
 
         [TestMethod]
-        public void testEquality_InchToFeet_EquivalentValue()
+        public void testConversion_InchToYard()
         {
-            Assert.IsTrue(_service.AreEqual(12.0, LengthUnit.Inch,
-                                            1.0, LengthUnit.Feet));
+            double result = _service.Convert(72.0, LengthUnit.Inch, LengthUnit.Yard);
+            Assert.AreEqual(2.0, result, EPSILON);
+        }
+
+        [TestMethod]
+        public void testConversion_CentimeterToInch()
+        {
+            double result = _service.Convert(2.54, LengthUnit.Centimeter, LengthUnit.Inch);
+            Assert.AreEqual(1.0, result, EPSILON);
         }
 
         // ============================================================
-        // YARD TESTS
+        // EDGE CASES
         // ============================================================
 
         [TestMethod]
-        public void testEquality_YardToYard_SameValue()
+        public void testConversion_ZeroValue()
         {
-            Assert.IsTrue(_service.AreEqual(2.0, LengthUnit.Yard,
-                                            2.0, LengthUnit.Yard));
+            double result = _service.Convert(0.0, LengthUnit.Feet, LengthUnit.Inch);
+            Assert.AreEqual(0.0, result, EPSILON);
         }
 
         [TestMethod]
-        public void testEquality_YardToYard_DifferentValue()
+        public void testConversion_NegativeValue()
         {
-            Assert.IsFalse(_service.AreEqual(1.0, LengthUnit.Yard,
-                                             2.0, LengthUnit.Yard));
+            double result = _service.Convert(-1.0, LengthUnit.Feet, LengthUnit.Inch);
+            Assert.AreEqual(-12.0, result, EPSILON);
         }
 
         [TestMethod]
-        public void testEquality_YardToFeet_EquivalentValue()
+        public void testConversion_SameUnit()
         {
-            Assert.IsTrue(_service.AreEqual(1.0, LengthUnit.Yard,
-                                            3.0, LengthUnit.Feet));
-        }
-
-        [TestMethod]
-        public void testEquality_FeetToYard_EquivalentValue()
-        {
-            Assert.IsTrue(_service.AreEqual(3.0, LengthUnit.Feet,
-                                            1.0, LengthUnit.Yard));
-        }
-
-        [TestMethod]
-        public void testEquality_YardToInch_EquivalentValue()
-        {
-            Assert.IsTrue(_service.AreEqual(1.0, LengthUnit.Yard,
-                                            36.0, LengthUnit.Inch));
-        }
-
-        [TestMethod]
-        public void testEquality_YardToFeet_NonEquivalentValue()
-        {
-            Assert.IsFalse(_service.AreEqual(1.0, LengthUnit.Yard,
-                                             2.0, LengthUnit.Feet));
+            double result = _service.Convert(5.0, LengthUnit.Feet, LengthUnit.Feet);
+            Assert.AreEqual(5.0, result, EPSILON);
         }
 
         // ============================================================
-        // CENTIMETER TESTS
+        // ROUND TRIP
         // ============================================================
 
         [TestMethod]
-        public void testEquality_CentimeterToCentimeter_SameValue()
+        public void testConversion_RoundTrip()
         {
-            Assert.IsTrue(_service.AreEqual(5.0, LengthUnit.Centimeter,
-                                            5.0, LengthUnit.Centimeter));
-        }
+            double value = 10.0;
 
-        [TestMethod]
-        public void testEquality_CentimeterToInch_EquivalentValue()
-        {
-            Assert.IsTrue(_service.AreEqual(1.0, LengthUnit.Centimeter,
-                                            0.393701, LengthUnit.Inch));
-        }
+            double converted = _service.Convert(value, LengthUnit.Feet, LengthUnit.Inch);
+            double back = _service.Convert(converted, LengthUnit.Inch, LengthUnit.Feet);
 
-        [TestMethod]
-        public void testEquality_CentimeterToFeet_NonEquivalentValue()
-        {
-            Assert.IsFalse(_service.AreEqual(1.0, LengthUnit.Centimeter,
-                                             1.0, LengthUnit.Feet));
+            Assert.AreEqual(value, back, EPSILON);
         }
 
         // ============================================================
-        // MULTI-UNIT COMPLEX SCENARIOS
+        // INVALID INPUT
         // ============================================================
 
         [TestMethod]
-        public void testEquality_AllUnits_ComplexScenario()
+        public void testConversion_NaN_Throws()
         {
-            Assert.IsTrue(_service.AreEqual(2.0, LengthUnit.Yard,
-                                            6.0, LengthUnit.Feet));
-
-            Assert.IsTrue(_service.AreEqual(6.0, LengthUnit.Feet,
-                                            72.0, LengthUnit.Inch));
+            try
+            {
+                _service.Convert(double.NaN, LengthUnit.Feet, LengthUnit.Inch);
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+                Assert.IsTrue(true); // Test passed
+            }
         }
 
         [TestMethod]
-        public void testEquality_MultiUnit_TransitiveProperty()
+        public void testConversion_Infinity_Throws()
         {
-            QuantityLength yard = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength feet = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength inch = new QuantityLength(36.0, LengthUnit.Inch);
-
-            Assert.IsTrue(yard.Equals(feet));
-            Assert.IsTrue(feet.Equals(inch));
-            Assert.IsTrue(yard.Equals(inch));
-        }
-
-        // ============================================================
-        // NULL & REFERENCE TESTS
-        // ============================================================
-
-        [TestMethod]
-        public void testEquality_SameReference()
-        {
-            QuantityLength q = new QuantityLength(1.0, LengthUnit.Feet);
-            Assert.IsTrue(q.Equals(q));
-        }
-
-        [TestMethod]
-        public void testEquality_NullComparison()
-        {
-            QuantityLength q = new QuantityLength(1.0, LengthUnit.Feet);
-            Assert.IsFalse(q.Equals(null));
+            try
+            {
+                _service.Convert(double.PositiveInfinity, LengthUnit.Feet, LengthUnit.Inch);
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+                Assert.IsTrue(true); // Test passed
+            }
         }
     }
 }

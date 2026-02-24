@@ -2,28 +2,51 @@ using System;
 
 namespace QuantityMeasurementApp.Models
 {
-    // Generic class representing a length measurement
-    // Combines value and unit (DRY compliant design)
+    // Represents a length value with unit
     public class QuantityLength
     {
-        private const double TOLERANCE = 0.0001;
+        private const double TOLERANCE = 1e-6;
 
         public double Value { get; }
         public LengthUnit Unit { get; }
 
+        // Constructor
         public QuantityLength(double value, LengthUnit unit)
         {
+            if (!double.IsFinite(value))
+                throw new ArgumentException("Value must be a valid number.");
+
             Value = value;
             Unit = unit;
         }
 
-        // Converts quantity into base unit (Feet)
-        private double ConvertToFeet()
+        // Convert current value to base unit (Feet)
+        private double ConvertToBase()
         {
             return Value * Unit.ToFeetFactor();
         }
 
-        // Implements value-based equality with tolerance
+        // Static conversion API (UC5)
+        public static double Convert(double value, LengthUnit source, LengthUnit target)
+        {
+            if (!double.IsFinite(value))
+                throw new ArgumentException("Value must be finite.");
+
+            if (source == target)
+                return value;
+
+            double baseValue = value * source.ToFeetFactor();
+            return baseValue / target.ToFeetFactor();
+        }
+
+        // Instance conversion
+        public QuantityLength ConvertTo(LengthUnit target)
+        {
+            double converted = Convert(Value, Unit, target);
+            return new QuantityLength(converted, target);
+        }
+
+        // Value-based equality
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
@@ -31,13 +54,17 @@ namespace QuantityMeasurementApp.Models
 
             QuantityLength other = (QuantityLength)obj;
 
-            return Math.Abs(ConvertToFeet() - other.ConvertToFeet()) < TOLERANCE;
+            return Math.Abs(ConvertToBase() - other.ConvertToBase()) < TOLERANCE;
         }
 
-        // Maintains equality contract
         public override int GetHashCode()
         {
-            return ConvertToFeet().GetHashCode();
+            return ConvertToBase().GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{Value} {Unit}";
         }
     }
 }

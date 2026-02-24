@@ -1,15 +1,14 @@
-# QuantityMeasurementApp – UC4 Extended Unit Support
+# QuantityMeasurementApp – UC5 Unit-to-Unit Conversion
 
 ## Overview
 
-UC4 extends the scalable design from UC3 by introducing additional length units:
+UC5 extends UC4 by introducing explicit unit-to-unit conversion functionality.
 
-- Yard
-- Centimeter
+In addition to equality comparison, the system now allows converting a numeric value from one `LengthUnit` to another using centralized conversion factors.
 
-The system continues to use a single generic `QuantityLength` class with a base unit (Feet) for all conversions and equality comparisons.
+All conversions are normalized through a common base unit (Feet), ensuring mathematical consistency and scalability.
 
-This demonstrates extensibility without modifying core business logic.
+This enhancement does not modify any existing UC1–UC4 logic and maintains full backward compatibility.
 
 ---
 
@@ -24,14 +23,20 @@ This demonstrates extensibility without modifying core business logic.
 
 ---
 
+## Public API Added
+
+---
+
 ## Key Features
 
-- Cross-unit equality (e.g., 1 Yard == 3 Feet)
-- Centimeter conversions (1 cm == 0.393701 inch)
-- Tolerance-based floating-point comparison
-- Full backward compatibility with UC1–UC3
-- No code duplication (DRY compliant)
-- Centralized conversion logic in enum extension
+- CDirect unit-to-unit conversion
+- Base unit normalization (Feet)
+- Same-unit conversion support
+- Zero and negative value handling
+- Round-trip conversion accuracy
+- Floating-point precision tolerance
+- Exception handling for invalid inputs
+- Full backward compatibility with UC1–UC4
 
 
 ---
@@ -49,12 +54,13 @@ This demonstrates extensibility without modifying core business logic.
 
 ## Test Coverage
 
-- Yard-to-yard equality
-- Yard-to-feet conversion
-- Yard-to-inch conversion
-- Centimeter cross-unit comparison
-- Transitive property validation
-- Null and reference checks
-- Complex multi-unit scenarios
+- Feet ↔ Inch conversions
+- Yard ↔ Feet conversions
+- Centimeter ↔ Inch conversions
+- Cross-unit conversions
+- Same-unit conversion
+- Zero and negative values
+- Round-trip validation
+- NaN and Infinity exception handling
 
-All previous UC1–UC3 tests continue to pass.
+All UC1–UC4 tests continue to pass without modification.

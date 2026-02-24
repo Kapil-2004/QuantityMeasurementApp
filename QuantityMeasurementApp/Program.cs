@@ -14,10 +14,11 @@ namespace QuantityMeasurementApp
             {
                 Console.Clear();
                 Console.WriteLine("=================================");
-                Console.WriteLine("  Quantity Measurement - UC3");
+                Console.WriteLine("  Quantity Measurement - UC5");
                 Console.WriteLine("=================================");
                 Console.WriteLine("1. Compare Two Lengths");
-                Console.WriteLine("2. Exit");
+                Console.WriteLine("2. Convert Length");
+                Console.WriteLine("3. Exit");
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
@@ -29,6 +30,10 @@ namespace QuantityMeasurementApp
                         break;
 
                     case "2":
+                        ConvertLength(service);
+                        break;
+
+                    case "3":
                         Console.WriteLine("Exiting application...");
                         return;
 
@@ -40,7 +45,7 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // Handles user input and comparison logic
+        // Compare two quantities
         private static void CompareLengths(QuantityLengthService service)
         {
             try
@@ -68,7 +73,34 @@ namespace QuantityMeasurementApp
             Console.ReadKey();
         }
 
-        // Reads and validates numeric input
+        // Convert one quantity to another unit (UC5)
+        private static void ConvertLength(QuantityLengthService service)
+        {
+            try
+            {
+                Console.WriteLine("\nEnter Quantity to Convert:");
+                double value = ReadDouble("Value: ");
+                LengthUnit sourceUnit = ReadUnit();
+
+                Console.WriteLine("\nConvert To:");
+                LengthUnit targetUnit = ReadUnit();
+
+                double result = service.Convert(value, sourceUnit, targetUnit);
+
+                Console.WriteLine("\n---------------------------------");
+                Console.WriteLine($"{value} {sourceUnit} = {result} {targetUnit}");
+                Console.WriteLine("---------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Read numeric input
         private static double ReadDouble(string message)
         {
             while (true)
@@ -81,7 +113,7 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // Reads and validates unit input
+        // Read unit input
         private static LengthUnit ReadUnit()
         {
             while (true)

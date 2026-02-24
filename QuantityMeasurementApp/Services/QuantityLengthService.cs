@@ -2,22 +2,37 @@ using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Services
 {
-    // Service class to separate business logic from Program.cs
+    // Handles comparison and conversion logic
     public class QuantityLengthService
     {
-        // Compares two quantities for equality
-        // Reduces dependency on main method
+        // Compare two quantities
         public bool AreEqual(double value1, LengthUnit unit1,
                              double value2, LengthUnit unit2)
         {
-            // Create first quantity object
-            QuantityLength q1 = new QuantityLength(value1, unit1);
+            var length1 = new QuantityLength(value1, unit1);
+            var length2 = new QuantityLength(value2, unit2);
 
-            // Create second quantity object
-            QuantityLength q2 = new QuantityLength(value2, unit2);
+            return length1.Equals(length2);
+        }
 
-            // Return equality result
-            return q1.Equals(q2);
+        // ============================================================
+        // UC5 - Unit to Unit Conversion
+        // ============================================================
+
+        // Converts a value from source unit to target unit
+        public double Convert(double value, LengthUnit source, LengthUnit target)
+        {
+            // Validate numeric input
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new ArgumentException("Invalid numeric value");
+
+            // Convert source value to base unit (Feet)
+            double valueInFeet = value * source.ToFeetFactor();
+
+            // Convert from base unit to target unit
+            double convertedValue = valueInFeet / target.ToFeetFactor();
+
+            return convertedValue;
         }
     }
 }
