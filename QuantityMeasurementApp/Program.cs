@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using QuantityMeasurementApp.Models;
 using QuantityMeasurementApp.Services;
 
@@ -14,12 +14,13 @@ namespace QuantityMeasurementApp
             {
                 Console.Clear();
                 Console.WriteLine("=================================");
-                Console.WriteLine("  Quantity Measurement - UC6");
+                Console.WriteLine("  Quantity Measurement - UC7");
                 Console.WriteLine("=================================");
                 Console.WriteLine("1. Compare Two Lengths");
                 Console.WriteLine("2. Convert Length");
                 Console.WriteLine("3. Add Two Lengths");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. Add Two Lengths (Specify Target Unit)");
+                Console.WriteLine("5. Exit");
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
@@ -39,6 +40,10 @@ namespace QuantityMeasurementApp
                         break;
 
                     case "4":
+                        AddLengthsWithTarget(service);
+                        break;
+
+                    case "5":
                         Console.WriteLine("Exiting application...");
                         return;
 
@@ -120,6 +125,41 @@ namespace QuantityMeasurementApp
                 LengthUnit unit2 = ReadUnit();
 
                 QuantityLength result = service.Add(value1, unit1, value2, unit2);
+
+                Console.WriteLine("\n---------------------------------");
+                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
+                Console.WriteLine("---------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+        // ============================================================
+        // UC7 - Add Two Lengths with Target Unit
+        // ============================================================
+
+        private static void AddLengthsWithTarget(QuantityLengthService service)
+        {
+            try
+            {
+                Console.WriteLine("\nEnter First Quantity:");
+                double value1 = ReadDouble("Value: ");
+                LengthUnit unit1 = ReadUnit();
+
+                Console.WriteLine("\nEnter Second Quantity:");
+                double value2 = ReadDouble("Value: ");
+                LengthUnit unit2 = ReadUnit();
+
+                Console.WriteLine("\nSelect Target Unit:");
+                LengthUnit targetUnit = ReadUnit();
+
+                QuantityLength result =
+                    service.Add(value1, unit1, value2, unit2, targetUnit);
 
                 Console.WriteLine("\n---------------------------------");
                 Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");

@@ -80,6 +80,35 @@ namespace QuantityMeasurementApp.Models
 
             return new QuantityLength(finalValue, this.Unit);
         }
+
+        // ============================================================
+        // UC7 - Addition with Explicit Target Unit
+        // ============================================================
+
+        // Overloaded Add method
+        // Adds another QuantityLength and returns result
+        // in the explicitly specified target unit
+        public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            // Validate numeric values
+            if (!double.IsFinite(this.Value) || !double.IsFinite(other.Value))
+                throw new ArgumentException("Invalid numeric value");
+
+            // Validate target unit (enum cannot be null but defensive check)
+            if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
+                throw new ArgumentException("Invalid target unit");
+
+            // Convert both to base unit (Feet)
+            double baseSum = this.ConvertToBase() + other.ConvertToBase();
+
+            // Convert base sum to explicitly specified target unit
+            double finalValue = baseSum / targetUnit.ToFeetFactor();
+
+            return new QuantityLength(finalValue, targetUnit);
+        }
         
         public override int GetHashCode()
         {

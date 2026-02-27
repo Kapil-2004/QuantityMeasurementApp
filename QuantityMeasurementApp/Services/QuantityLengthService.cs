@@ -48,5 +48,19 @@ namespace QuantityMeasurementApp.Services
 
             return length1.Add(length2);
         }
+
+        // ============================================================
+        // UC7 - Addition with Target Unit Specification
+        // ============================================================
+
+        public QuantityLength Add(double value1, LengthUnit unit1,
+                                double value2, LengthUnit unit2,
+                                LengthUnit targetUnit)
+        {
+            var length1 = new QuantityLength(value1, unit1);
+            var length2 = new QuantityLength(value2, unit2);
+
+            return length1.Add(length2, targetUnit);
+        }
     }
 }

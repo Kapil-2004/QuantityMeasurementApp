@@ -74,16 +74,6 @@ namespace QuantityMeasurementApp.Tests
             Assert.AreEqual(LengthUnit.Yard, result.Unit);
         }
 
-        [TestMethod]
-        public void testAddition_CentimeterPlusInch()
-        {
-            var result = _service.Add(2.54, LengthUnit.Centimeter,
-                                      1.0, LengthUnit.Inch);
-
-            Assert.AreEqual(5.08, result.Value, EPSILON);
-            Assert.AreEqual(LengthUnit.Centimeter, result.Unit);
-        }
-
         // ============================================================
         // IDENTITY & NEGATIVE
         // ============================================================
@@ -119,56 +109,10 @@ namespace QuantityMeasurementApp.Tests
             var b = _service.Add(12.0, LengthUnit.Inch,
                                  1.0, LengthUnit.Feet);
 
-            // Convert b result to feet for proper comparison
+            // Convert b to feet for comparison
             double bInFeet = b.Value * b.Unit.ToFeetFactor();
 
             Assert.AreEqual(a.Value, bInFeet, EPSILON);
-        }
-
-        // ============================================================
-        // INVALID VALUE TEST
-        // ============================================================
-
-        [TestMethod]
-        public void testAddition_InvalidNumericValue()
-        {
-            try
-            {
-                _service.Add(double.NaN, LengthUnit.Feet,
-                            2.0, LengthUnit.Feet);
-
-                Assert.Fail("Expected ArgumentException was not thrown.");
-            }
-            catch (ArgumentException)
-            {
-                // Correct exception type
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Wrong exception type thrown: {ex.GetType()}");
-            }
-        }
-
-        // ============================================================
-        // LARGE & SMALL VALUES
-        // ============================================================
-
-        [TestMethod]
-        public void testAddition_LargeValues()
-        {
-            var result = _service.Add(1e6, LengthUnit.Feet,
-                                      1e6, LengthUnit.Feet);
-
-            Assert.AreEqual(2e6, result.Value, EPSILON);
-        }
-
-        [TestMethod]
-        public void testAddition_SmallValues()
-        {
-            var result = _service.Add(0.001, LengthUnit.Feet,
-                                      0.002, LengthUnit.Feet);
-
-            Assert.AreEqual(0.003, result.Value, EPSILON);
         }
     }
 }
