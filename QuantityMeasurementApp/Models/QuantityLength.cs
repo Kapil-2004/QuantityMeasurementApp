@@ -2,7 +2,18 @@ using System;
 
 namespace QuantityMeasurementApp.Models
 {
-    // Represents a length value with unit
+    /*
+     * UC8 SIMPLIFIED DESIGN
+     * -------------------------------------------------------
+     * QuantityLength is now ONLY responsible for:
+     * - Holding value + unit
+     * - Equality comparison
+     * - Arithmetic (Addition)
+     * 
+     * It NO LONGER knows conversion factors.
+     * It delegates conversion to LengthUnitHelper.
+     */
+
     public class QuantityLength
     {
         private const double TOLERANCE = 1e-6;
@@ -10,106 +21,89 @@ namespace QuantityMeasurementApp.Models
         public double Value { get; }
         public LengthUnit Unit { get; }
 
-        // Constructor
         public QuantityLength(double value, LengthUnit unit)
         {
+            // Validate numeric value
             if (!double.IsFinite(value))
-                throw new ArgumentException("Value must be a valid number.");
+                throw new ArgumentException("Value must be finite.");
+
+            // Validate enum
+            if (!Enum.IsDefined(typeof(LengthUnit), unit))
+                throw new ArgumentException("Invalid unit.");
 
             Value = value;
             Unit = unit;
         }
 
-        // Convert current value to base unit (Feet)
+        // ----------------------------------------------------
+        // Converts current object to base unit (Feet)
+        // Delegates to LengthUnitHelper
+        // ----------------------------------------------------
         private double ConvertToBase()
         {
-            return Value * Unit.ToFeetFactor();
+            return LengthUnitHelper.ConvertToBaseUnit(Unit, Value);
         }
 
-        // Static conversion API (UC5)
-        public static double Convert(double value, LengthUnit source, LengthUnit target)
+        // ----------------------------------------------------
+        // UC5 - Convert to another unit
+        // ----------------------------------------------------
+        public QuantityLength ConvertTo(LengthUnit targetUnit)
         {
-            if (!double.IsFinite(value))
-                throw new ArgumentException("Value must be finite.");
+            double baseValue = ConvertToBase();
+            double convertedValue =
+                LengthUnitHelper.ConvertFromBaseUnit(targetUnit, baseValue);
 
-            if (source == target)
-                return value;
-
-            double baseValue = value * source.ToFeetFactor();
-            return baseValue / target.ToFeetFactor();
+            return new QuantityLength(convertedValue, targetUnit);
         }
 
-        // Instance conversion
-        public QuantityLength ConvertTo(LengthUnit target)
-        {
-            double converted = Convert(Value, Unit, target);
-            return new QuantityLength(converted, target);
-        }
-
-        // Value-based equality
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-                return false;
-
-            QuantityLength other = (QuantityLength)obj;
-
-            return Math.Abs(ConvertToBase() - other.ConvertToBase()) < TOLERANCE;
-        }
-
-        // ============================================================
-        // UC6 - Addition of Two Lengths
-        // ============================================================
-
-        // Adds another QuantityLength and returns result
-        // in the unit of the current object (first operand)
+        // ----------------------------------------------------
+        // UC6 - Add two quantities (result in first unit)
+        // ----------------------------------------------------
         public QuantityLength Add(QuantityLength other)
         {
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            // Validate values
-            if (!double.IsFinite(this.Value) || !double.IsFinite(other.Value))
-                throw new ArgumentException("Invalid numeric value");
-
-            // Convert both to base unit (Feet)
+            // Convert both to base unit
             double baseSum = this.ConvertToBase() + other.ConvertToBase();
 
-            // Convert result back to first operand's unit
-            double finalValue = baseSum / this.Unit.ToFeetFactor();
+            // Convert result back to first unit
+            double finalValue =
+                LengthUnitHelper.ConvertFromBaseUnit(this.Unit, baseSum);
 
             return new QuantityLength(finalValue, this.Unit);
         }
 
-        // ============================================================
-        // UC7 - Addition with Explicit Target Unit
-        // ============================================================
-
-        // Overloaded Add method
-        // Adds another QuantityLength and returns result
-        // in the explicitly specified target unit
+        // ----------------------------------------------------
+        // UC7 - Add with explicit target unit
+        // ----------------------------------------------------
         public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
         {
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            // Validate numeric values
-            if (!double.IsFinite(this.Value) || !double.IsFinite(other.Value))
-                throw new ArgumentException("Invalid numeric value");
-
-            // Validate target unit (enum cannot be null but defensive check)
             if (!Enum.IsDefined(typeof(LengthUnit), targetUnit))
-                throw new ArgumentException("Invalid target unit");
+                throw new ArgumentException("Invalid target unit.");
 
-            // Convert both to base unit (Feet)
             double baseSum = this.ConvertToBase() + other.ConvertToBase();
 
-            // Convert base sum to explicitly specified target unit
-            double finalValue = baseSum / targetUnit.ToFeetFactor();
+            double finalValue =
+                LengthUnitHelper.ConvertFromBaseUnit(targetUnit, baseSum);
 
             return new QuantityLength(finalValue, targetUnit);
         }
-        
+
+        // ----------------------------------------------------
+        // UC1–UC4 Equality (cross unit supported)
+        // ----------------------------------------------------
+        public override bool Equals(object obj)
+        {
+            if (obj is not QuantityLength other)
+                return false;
+
+            return Math.Abs(this.ConvertToBase() - other.ConvertToBase()) < TOLERANCE;
+        }
+
         public override int GetHashCode()
         {
             return ConvertToBase().GetHashCode();

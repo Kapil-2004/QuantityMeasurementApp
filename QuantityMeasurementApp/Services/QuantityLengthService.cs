@@ -22,17 +22,13 @@ namespace QuantityMeasurementApp.Services
         // Converts a value from source unit to target unit
         public double Convert(double value, LengthUnit source, LengthUnit target)
         {
-            // Validate numeric input
-            if (double.IsNaN(value) || double.IsInfinity(value))
+            if (!double.IsFinite(value))
                 throw new ArgumentException("Invalid numeric value");
 
-            // Convert source value to base unit (Feet)
-            double valueInFeet = value * source.ToFeetFactor();
+            double baseValue =
+                LengthUnitHelper.ConvertToBaseUnit(source, value);
 
-            // Convert from base unit to target unit
-            double convertedValue = valueInFeet / target.ToFeetFactor();
-
-            return convertedValue;
+            return LengthUnitHelper.ConvertFromBaseUnit(target, baseValue);
         }
 
         

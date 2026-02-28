@@ -1,13 +1,13 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Models;
 using QuantityMeasurementApp.Services;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace QuantityMeasurementApp.Tests
 {
     [TestClass]
     public class QuantityLengthAdditionTests
     {
-        private QuantityLengthService _service;
+        private QuantityLengthService _service = null!;
         private const double EPSILON = 0.0001;
 
         [TestInitialize]
@@ -21,7 +21,7 @@ namespace QuantityMeasurementApp.Tests
         // ============================================================
 
         [TestMethod]
-        public void testAddition_SameUnit_FeetPlusFeet()
+        public void TestAddition_SameUnit_FeetPlusFeet()
         {
             var result = _service.Add(1.0, LengthUnit.Feet,
                                       2.0, LengthUnit.Feet);
@@ -31,7 +31,7 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [TestMethod]
-        public void testAddition_SameUnit_InchPlusInch()
+        public void TestAddition_SameUnit_InchPlusInch()
         {
             var result = _service.Add(6.0, LengthUnit.Inch,
                                       6.0, LengthUnit.Inch);
@@ -45,7 +45,7 @@ namespace QuantityMeasurementApp.Tests
         // ============================================================
 
         [TestMethod]
-        public void testAddition_FeetPlusInches()
+        public void TestAddition_FeetPlusInches()
         {
             var result = _service.Add(1.0, LengthUnit.Feet,
                                       12.0, LengthUnit.Inch);
@@ -55,7 +55,7 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [TestMethod]
-        public void testAddition_InchesPlusFeet()
+        public void TestAddition_InchesPlusFeet()
         {
             var result = _service.Add(12.0, LengthUnit.Inch,
                                       1.0, LengthUnit.Feet);
@@ -65,7 +65,7 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [TestMethod]
-        public void testAddition_YardPlusFeet()
+        public void TestAddition_YardPlusFeet()
         {
             var result = _service.Add(1.0, LengthUnit.Yard,
                                       3.0, LengthUnit.Feet);
@@ -79,7 +79,7 @@ namespace QuantityMeasurementApp.Tests
         // ============================================================
 
         [TestMethod]
-        public void testAddition_WithZero()
+        public void TestAddition_WithZero()
         {
             var result = _service.Add(5.0, LengthUnit.Feet,
                                       0.0, LengthUnit.Inch);
@@ -88,7 +88,7 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [TestMethod]
-        public void testAddition_NegativeValue()
+        public void TestAddition_NegativeValue()
         {
             var result = _service.Add(5.0, LengthUnit.Feet,
                                      -2.0, LengthUnit.Feet);
@@ -101,7 +101,7 @@ namespace QuantityMeasurementApp.Tests
         // ============================================================
 
         [TestMethod]
-        public void testAddition_Commutativity()
+        public void TestAddition_Commutativity()
         {
             var a = _service.Add(1.0, LengthUnit.Feet,
                                  12.0, LengthUnit.Inch);
@@ -110,7 +110,7 @@ namespace QuantityMeasurementApp.Tests
                                  1.0, LengthUnit.Feet);
 
             // Convert b to feet for comparison
-            double bInFeet = b.Value * b.Unit.ToFeetFactor();
+            var bInFeet = _service.Convert(b.Value, b.Unit, LengthUnit.Feet);
 
             Assert.AreEqual(a.Value, bInFeet, EPSILON);
         }
