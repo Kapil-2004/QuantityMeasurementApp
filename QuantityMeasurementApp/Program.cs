@@ -6,47 +6,39 @@ namespace QuantityMeasurementApp
 {
     internal class Program
     {
+        // Entry point of the application
         static void Main(string[] args)
         {
-            QuantityLengthService service = new QuantityLengthService();
+            // Create service objects for Length and Weight
+            QuantityLengthService lengthService = new QuantityLengthService();
+            QuantityWeightService weightService = new QuantityWeightService();
 
+            // Main application loop
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("=================================");
-                Console.WriteLine("  Quantity Measurement - UC7");
+                Console.WriteLine("  Quantity Measurement  ");
                 Console.WriteLine("=================================");
-                Console.WriteLine("1. Compare Two Lengths");
-                Console.WriteLine("2. Convert Length");
-                Console.WriteLine("3. Add Two Lengths");
-                Console.WriteLine("4. Add Two Lengths (Specify Target Unit)");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("1. Length Operations (UC1–UC8)");
+                Console.WriteLine("2. Weight Operations (UC9)");
+                Console.WriteLine("3. Exit");
                 Console.Write("Select an option: ");
 
                 string choice = Console.ReadLine();
 
+                // Route to selected module
                 switch (choice)
                 {
                     case "1":
-                        CompareLengths(service);
+                        ShowLengthMenu(lengthService);
                         break;
-
                     case "2":
-                        ConvertLength(service);
+                        ShowWeightMenu(weightService);
                         break;
-
                     case "3":
-                        AddLengths(service);
-                        break;
-
-                    case "4":
-                        AddLengthsWithTarget(service);
-                        break;
-
-                    case "5":
                         Console.WriteLine("Exiting application...");
                         return;
-
                     default:
                         Console.WriteLine("Invalid choice. Press any key...");
                         Console.ReadKey();
@@ -55,19 +47,102 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // UC1–UC4: Compare two quantities
+        // ===================== LENGTH MENU =====================
+        // Displays all Length-related operations (UC1–UC8)
+        private static void ShowLengthMenu(QuantityLengthService service)
+        {
+            Console.Clear();
+            Console.WriteLine("=================================");
+            Console.WriteLine("  Length Operations - UC8");
+            Console.WriteLine("=================================");
+            Console.WriteLine("1. Compare Two Lengths");
+            Console.WriteLine("2. Convert Length");
+            Console.WriteLine("3. Add Two Lengths");
+            Console.WriteLine("4. Add Two Lengths (Specify Target Unit)");
+            Console.Write("Select an option: ");
+
+            string choice = Console.ReadLine();
+
+            // Calls respective length operation
+            switch (choice)
+            {
+                case "1": CompareLengths(service); break;
+                case "2": ConvertLength(service); break;
+                case "3": AddLengths(service); break;
+                case "4": AddLengthsWithTarget(service); break;
+                default:
+                    Console.WriteLine("Invalid choice.");
+                    Pause();
+                    break;
+            }
+        }
+
+        private static void AddLengthsWithTarget(QuantityLengthService service)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void AddLengths(QuantityLengthService service)
+        {
+            throw new NotImplementedException();
+        }
+
         private static void CompareLengths(QuantityLengthService service)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ConvertLength(QuantityLengthService service)
+        {
+            throw new NotImplementedException();
+        }
+
+        // ===================== WEIGHT MENU =====================
+        // Displays all Weight-related operations (UC9)
+        private static void ShowWeightMenu(QuantityWeightService service)
+        {
+            Console.Clear();
+            Console.WriteLine("=================================");
+            Console.WriteLine("  Weight Operations - UC9");
+            Console.WriteLine("=================================");
+            Console.WriteLine("1. Compare Two Weights");
+            Console.WriteLine("2. Convert Weight");
+            Console.WriteLine("3. Add Two Weights");
+            Console.WriteLine("4. Add Two Weights (Specify Target Unit)");
+            Console.Write("Select an option: ");
+
+            string choice = Console.ReadLine();
+
+            // Calls respective weight operation
+            switch (choice)
+            {
+                case "1": CompareWeights(service); break;
+                case "2": ConvertWeight(service); break;
+                case "3": AddWeights(service); break;
+                case "4": AddWeightsWithTarget(service); break;
+                default:
+                    Console.WriteLine("Invalid choice.");
+                    Pause();
+                    break;
+            }
+        }
+
+        // ===================== WEIGHT OPERATIONS =====================
+
+        // Compares two weight quantities for equality
+        private static void CompareWeights(QuantityWeightService service)
         {
             try
             {
                 Console.WriteLine("\nEnter First Quantity:");
                 double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadUnit();
+                WeightUnit unit1 = ReadWeightUnit();
 
                 Console.WriteLine("\nEnter Second Quantity:");
                 double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadUnit();
+                WeightUnit unit2 = ReadWeightUnit();
 
+                // Uses service layer for comparison logic
                 bool result = service.AreEqual(value1, unit1, value2, unit2);
 
                 Console.WriteLine("\n---------------------------------");
@@ -82,18 +157,19 @@ namespace QuantityMeasurementApp
             Pause();
         }
 
-        // UC5: Convert length
-        private static void ConvertLength(QuantityLengthService service)
+        // Converts weight from one unit to another
+        private static void ConvertWeight(QuantityWeightService service)
         {
             try
             {
                 Console.WriteLine("\nEnter Quantity to Convert:");
                 double value = ReadDouble("Value: ");
-                LengthUnit sourceUnit = ReadUnit();
+                WeightUnit sourceUnit = ReadWeightUnit();
 
                 Console.WriteLine("\nConvert To:");
-                LengthUnit targetUnit = ReadUnit();
+                WeightUnit targetUnit = ReadWeightUnit();
 
+                // Uses service layer for conversion
                 double result = service.Convert(value, sourceUnit, targetUnit);
 
                 Console.WriteLine("\n---------------------------------");
@@ -108,23 +184,21 @@ namespace QuantityMeasurementApp
             Pause();
         }
 
-        // ============================================================
-        // UC6 - Add Two Lengths
-        // ============================================================
-
-        private static void AddLengths(QuantityLengthService service)
+        // Adds two weights and returns result in first unit
+        private static void AddWeights(QuantityWeightService service)
         {
             try
             {
                 Console.WriteLine("\nEnter First Quantity:");
                 double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadUnit();
+                WeightUnit unit1 = ReadWeightUnit();
 
                 Console.WriteLine("\nEnter Second Quantity:");
                 double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadUnit();
+                WeightUnit unit2 = ReadWeightUnit();
 
-                QuantityLength result = service.Add(value1, unit1, value2, unit2);
+                // Uses service Add method
+                QuantityWeight result = service.Add(value1, unit1, value2, unit2);
 
                 Console.WriteLine("\n---------------------------------");
                 Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
@@ -135,30 +209,27 @@ namespace QuantityMeasurementApp
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
+            Pause();
         }
 
-        // ============================================================
-        // UC7 - Add Two Lengths with Target Unit
-        // ============================================================
-
-        private static void AddLengthsWithTarget(QuantityLengthService service)
+        // Adds two weights and converts result to specified target unit
+        private static void AddWeightsWithTarget(QuantityWeightService service)
         {
             try
             {
                 Console.WriteLine("\nEnter First Quantity:");
                 double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadUnit();
+                WeightUnit unit1 = ReadWeightUnit();
 
                 Console.WriteLine("\nEnter Second Quantity:");
                 double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadUnit();
+                WeightUnit unit2 = ReadWeightUnit();
 
                 Console.WriteLine("\nSelect Target Unit:");
-                LengthUnit targetUnit = ReadUnit();
+                WeightUnit targetUnit = ReadWeightUnit();
 
-                QuantityLength result =
+                // Uses overloaded Add method with target unit
+                QuantityWeight result =
                     service.Add(value1, unit1, value2, unit2, targetUnit);
 
                 Console.WriteLine("\n---------------------------------");
@@ -170,11 +241,37 @@ namespace QuantityMeasurementApp
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
+            Pause();
         }
 
-        // Read numeric input safely
+        // ===================== INPUT HELPERS =====================
+
+        // Reads weight unit from user input
+        private static WeightUnit ReadWeightUnit()
+        {
+            while (true)
+            {
+                Console.WriteLine("Select Unit:");
+                Console.WriteLine("1. Kilogram");
+                Console.WriteLine("2. Gram");
+                Console.WriteLine("3. Pound");
+                Console.Write("Choice: ");
+
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1": return WeightUnit.Kilogram;
+                    case "2": return WeightUnit.Gram;
+                    case "3": return WeightUnit.Pound;
+                    default:
+                        Console.WriteLine("Invalid unit selection. Try again.");
+                        break;
+                }
+            }
+        }
+
+        // Reads and validates numeric input
         private static double ReadDouble(string message)
         {
             while (true)
@@ -187,33 +284,7 @@ namespace QuantityMeasurementApp
             }
         }
 
-        // Read unit selection
-        private static LengthUnit ReadUnit()
-        {
-            while (true)
-            {
-                Console.WriteLine("Select Unit:");
-                Console.WriteLine("1. Feet");
-                Console.WriteLine("2. Inch");
-                Console.WriteLine("3. Yard");
-                Console.WriteLine("4. Centimeter");
-                Console.Write("Choice: ");
-
-                string input = Console.ReadLine();
-
-                switch (input)
-                {
-                    case "1": return LengthUnit.Feet;
-                    case "2": return LengthUnit.Inch;
-                    case "3": return LengthUnit.Yard;
-                    case "4": return LengthUnit.Centimeter;
-                    default:
-                        Console.WriteLine("Invalid unit selection. Try again.");
-                        break;
-                }
-            }
-        }
-
+        // Pauses execution until key press
         private static void Pause()
         {
             Console.WriteLine("\nPress any key to continue...");
