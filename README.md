@@ -1,166 +1,143 @@
-# 📏 Quantity Measurement App – UC8 Refactoring with Standalone LengthUnit
+# 🛡️ QuantityMeasurementApp – UC10 Robust Unit Validation & Error Handling
 
-## Overview
+## 📋 Overview
 
-UC8 refactors the architecture by extracting `LengthUnit` as a standalone, conversion-responsible component. This improves **Single Responsibility Principle (SRP)** and **scalability** while maintaining full backward compatibility with UC1–UC7.
+UC10 enhances the reliability of the application by introducing **strict unit validation** and **controlled exception handling** across the service and model layers.
 
-**Key Achievement:** Unit conversion logic is now centralized in `LengthUnit`, allowing `QuantityLength` to focus solely on storing measurements and delegating unit operations.
-
----
-
-## 📐 Supported Units
-
-| Unit        | Conversion to Feet     |
-|-------------|------------------------|
-| Feet        | 1.0                    |
-| Inch        | 1 / 12                 |
-| Yard        | 3.0                    |
-| Centimeter  | 0.0328084167           |
+This use case ensures that invalid enum values (e.g., `(LengthUnit)999`) are handled gracefully using **domain-level exceptions** instead of low-level runtime errors like `KeyNotFoundException`.
 
 ---
 
-## 🔧 Public API
+## 🎯 Objectives
 
-### LengthUnit (UC8 New)
+- Prevent internal dictionary exceptions
+- Validate enum values before conversion
+- Throw meaningful `ArgumentException` for invalid units
+- Improve domain safety and architectural cleanliness
+- Ensure all tests pass with proper error expectations
+
+---
+
+## 🧠 Problem Before UC10
+
+### The Issue
+
+When an invalid unit was passed:
+
 ```csharp
-// Standalone unit conversion
-public double ConvertToBase(double value);
-public double ConvertFromBase(double baseValue);
-public double ConvertTo(double value, LengthUnit targetUnit);
+(LengthUnit)999
 ```
 
-### QuantityLength (All UCs)
+The system attempted to access a dictionary key directly:
+
 ```csharp
-// Constructor
-public QuantityLength(double value, LengthUnit unit);
-
-// Properties
-public double Value { get; }
-public LengthUnit Unit { get; }
-
-// Equality & Addition
-public bool Equals(QuantityLength other);
-public QuantityLength Add(QuantityLength other);
-public QuantityLength Add(QuantityLength other, LengthUnit targetUnit);
+Factors[unit]
 ```
 
-### QuantityLengthService (UC6+)
-```csharp
-public bool AreEqual(QuantityLength length1, QuantityLength length2);
-public double ConvertTo(double value, LengthUnit from, LengthUnit to);
-public QuantityLength Add(QuantityLength length1, QuantityLength length2);
-public QuantityLength Add(QuantityLength length1, QuantityLength length2, LengthUnit targetUnit);
+This caused:
+
+```
+KeyNotFoundException
 ```
 
----
+### Why This Was Bad
 
-## ✅ Key Features
-
-- Standalone `LengthUnit` handles all conversions  
-- `QuantityLength` delegates to `LengthUnit`  
-- Same-unit addition with custom result unit  
-- Cross-unit addition with explicit target unit  
-- Base unit normalization (Feet)  
-- Immutability preserved  
-- Floating-point precision tolerance (0.01%)  
-- Full backward compatibility with UC1–UC7  
+- ❌ Leaks internal implementation details
+- ❌ Breaks clean architecture principles
+- ❌ Fails explicit invalid target unit tests
 
 ---
 
-## 📝 Addition Rules
+## ✅ Solution Implemented
 
-1. Both operands must be Length measurements  
-2. Values must be finite numbers  
-3. Both values converted to base unit (Feet)  
-4. Addition performed in base unit  
-5. Sum converted to target unit  
-6. New `QuantityLength` object returned  
+### 1️⃣ Enum Validation Before Dictionary Access
+
+Added validation using:
+
+```csharp
+if (!Enum.IsDefined(typeof(LengthUnit), unit))
+    throw new ArgumentException($"Invalid LengthUnit: {unit}");
+```
+
+Applied to:
+- `LengthUnit`
+- `WeightUnit`
+
+### 2️⃣ Controlled Exception Handling
+
+When an invalid unit is passed:
+
+```csharp
+(LengthUnit)999
+```
+
+The system now throws:
+
+```csharp
+ArgumentException: Invalid LengthUnit: 999
+```
+
+**Benefits:**
+- ✔️ Clean and predictable
+- ✔️ Test-aligned expectations
+- ✔️ Domain-driven design
+- ✔️ Self-documenting
 
 ---
 
-## 🛠️ Architecture Changes (UC8)
+## 🏗️ Architectural Improvement
 
-**Before (UC1–UC7):**
-- `QuantityLength` mixed concerns (storage + conversion logic)
+### Before UC10
 
-**After (UC8):**
-- `LengthUnit` owns all conversion responsibility  
-- `QuantityLength` simplified to store value/unit and delegate  
-- Cleaner separation of concerns  
-- Better testability  
-- Improved scalability for new measurement types  
+```
+Enum → Dictionary Access → Runtime Crash (KeyNotFoundException)
+```
+
+### After UC10
+
+```
+Enum → Validation Layer → Controlled Domain Exception (ArgumentException)
+```
+
+This ensures the model layer does **not leak implementation details**.
 
 ---
 
 ## 🧪 Test Coverage
 
-- ✅ UC1–UC7: Basic equality, conversion, addition (all preserved)  
-- ✅ UC8: `LengthUnit` standalone conversion validation  
-- ✅ UC8: `QuantityLength` delegation verification  
-- ✅ UC8: Architecture separation validation  
-- ✅ 100% backward compatibility confirmed  
+UC10 ensures the following test categories pass:
+
+- ✅ Invalid explicit target unit
+- ✅ Invalid conversion unit
+- ✅ Invalid addition target unit
+- ✅ All existing equality and addition tests
+
+### Test Results
+
+| Metric | Count |
+|--------|-------|
+| **Total Tests** | 42 |
+| **Passed** | 42 |
+| **Failed** | 0 |
 
 ---
 
-## 🏃 Running Tests
+## 🔒 Design Principles Applied
 
-```bash
-dotnet test
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- .NET 10.0 or later  
-- Visual Studio 2022+ or VS Code  
-
-### Build & Run
-```bash
-dotnet restore
-dotnet build
-dotnet test
-dotnet run
-```
+1. **Defensive Programming** - Validate inputs early
+2. **Fail Fast Strategy** - Detect errors at domain level
+3. **Clean Exception Boundaries** - Use domain exceptions, not framework errors
+4. **Encapsulation** - Hide internal data structures
+5. **Domain-Level Validation** - Business logic owns validation
 
 ---
 
-## 📦 Project Structure
+## 🚀 Outcome
 
-```
-QuantityMeasurementApp/
-├── Models/
-│   ├── LengthUnit.cs              # Unit conversion (UC8)
-│   └── QuantityLength.cs           # Measurement model
-├── Services/
-│   └── QuantityLengthService.cs   # Public API layer
-└── Program.cs
+UC10 makes the system:
 
-QuantityMeasurementApp.Tests/
-├── QuantityLengthTests.cs
-├── QuantityLengthAdditionTests.cs
-└── QuantityLengthExplicitTargetAdditionTests.cs
-```
-
----
-
-## 💡 UC1–UC8 Summary
-
-| UC | Feature | Status |
-|----|---------|--------|
-| 1 | Basic equality (same unit) | ✅ |
-| 2 | Cross-unit equality | ✅ |
-| 3 | Category validation | ✅ |
-| 4 | Explicit conversion | ✅ |
-| 5 | Tolerance-based comparison | ✅ |
-| 6 | Smart addition (auto unit) | ✅ |
-| 7 | Target unit addition | ✅ |
-| 8 | Refactored architecture (SRP) | ✅ New |
-
----
-
-**Last Updated:** February 2026 | **Version:** UC8 | **Status:** Production-Ready ✨
-
-- ✓ NaN and invalid numeric exception handling  
-- ✓ Invalid target unit handling
+- 🔧 **More Stable** - Predictable error handling
+- 📚 **More Maintainable** - Clear validation boundaries
+- 🏭 **Production-Ready** - Handles edge cases gracefully
+- 🎓 **Interview-Ready** - Demonstrates architectural best practices
+- 🏛️ **Architecturally Sound** - Follows SOLID principles

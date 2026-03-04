@@ -2,61 +2,48 @@ using QuantityMeasurementApp.Models;
 
 namespace QuantityMeasurementApp.Services
 {
-    // Handles comparison and conversion logic
-    public class QuantityLengthService
+    /// <summary>
+    /// Length-specific service with convenient raw-value APIs.
+    /// </summary>
+    public class QuantityLengthService : QuantityService<LengthUnit>
     {
-        // Compare two quantities
-        public bool AreEqual(double value1, LengthUnit unit1,
-                             double value2, LengthUnit unit2)
+        public bool AreEqual(
+            double value1, LengthUnit unit1,
+            double value2, LengthUnit unit2)
         {
-            var length1 = new QuantityLength(value1, unit1);
-            var length2 = new QuantityLength(value2, unit2);
+            var q1 = new Quantity<LengthUnit>(value1, unit1);
+            var q2 = new Quantity<LengthUnit>(value2, unit2);
 
-            return length1.Equals(length2);
+            return base.AreEqual(q1, q2);
         }
 
-        // ============================================================
-        // UC5 - Unit to Unit Conversion
-        // ============================================================
-
-        // Converts a value from source unit to target unit
-        public double Convert(double value, LengthUnit source, LengthUnit target)
+        public double Convert(
+            double value,
+            LengthUnit from,
+            LengthUnit to)
         {
-            if (!double.IsFinite(value))
-                throw new ArgumentException("Invalid numeric value");
-
-            double baseValue =
-                LengthUnitHelper.ConvertToBaseUnit(source, value);
-
-            return LengthUnitHelper.ConvertFromBaseUnit(target, baseValue);
+            return base.ConvertTo(value, from, to);
         }
 
-        
-        // ============================================================
-        // UC6 - Addition Service Method
-        // ============================================================
-
-        public QuantityLength Add(double value1, LengthUnit unit1,
-                                double value2, LengthUnit unit2)
+        public Quantity<LengthUnit> Add(
+            double value1, LengthUnit unit1,
+            double value2, LengthUnit unit2)
         {
-            var length1 = new QuantityLength(value1, unit1);
-            var length2 = new QuantityLength(value2, unit2);
+            var q1 = new Quantity<LengthUnit>(value1, unit1);
+            var q2 = new Quantity<LengthUnit>(value2, unit2);
 
-            return length1.Add(length2);
+            return base.Add(q1, q2);
         }
 
-        // ============================================================
-        // UC7 - Addition with Target Unit Specification
-        // ============================================================
-
-        public QuantityLength Add(double value1, LengthUnit unit1,
-                                double value2, LengthUnit unit2,
-                                LengthUnit targetUnit)
+        public Quantity<LengthUnit> Add(
+            double value1, LengthUnit unit1,
+            double value2, LengthUnit unit2,
+            LengthUnit targetUnit)
         {
-            var length1 = new QuantityLength(value1, unit1);
-            var length2 = new QuantityLength(value2, unit2);
+            var q1 = new Quantity<LengthUnit>(value1, unit1);
+            var q2 = new Quantity<LengthUnit>(value2, unit2);
 
-            return length1.Add(length2, targetUnit);
+            return base.Add(q1, q2, targetUnit);
         }
     }
 }
