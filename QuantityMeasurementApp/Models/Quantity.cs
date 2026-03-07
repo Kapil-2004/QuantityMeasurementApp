@@ -81,24 +81,30 @@ namespace QuantityMeasurementApp.Models
             => $"Quantity({Value}, {Unit})";
 
         // Helper: Convert to base depending on enum type
-        private static double ConvertToBase(double value, U unit)
+        private double ConvertToBase(double value, U unit)
         {
-            if (unit is LengthUnit l)
-                return l.ConvertToBase(value);
+            if (unit is LengthUnit length)
+                return length.ConvertToBase(value);
 
-            if (unit is WeightUnit w)
-                return w.ConvertToBase(value);
+            if (unit is WeightUnit weight)
+                return weight.ConvertToBase(value);
+
+            if (unit is VolumeUnit volume)
+                return volume.ConvertToBase(value);
 
             throw new InvalidOperationException("Unsupported unit type.");
         }
 
-        private static double ConvertFromBase(double baseValue, U unit)
+        private double ConvertFromBase(double baseValue, U unit)
         {
-            if (unit is LengthUnit l)
-                return l.ConvertFromBase(baseValue);
+            if (unit is LengthUnit length)
+                return length.ConvertFromBase(baseValue);
 
-            if (unit is WeightUnit w)
-                return w.ConvertFromBase(baseValue);
+            if (unit is WeightUnit weight)
+                return weight.ConvertFromBase(baseValue);
+
+            if (unit is VolumeUnit volume)
+                return volume.ConvertFromBase(baseValue);
 
             throw new InvalidOperationException("Unsupported unit type.");
         }

@@ -1,143 +1,185 @@
-# 🛡️ QuantityMeasurementApp – UC10 Robust Unit Validation & Error Handling
+# QuantityMeasurementApp – UC11 Volume Measurement Support
 
 ## 📋 Overview
 
-UC10 enhances the reliability of the application by introducing **strict unit validation** and **controlled exception handling** across the service and model layers.
+UC11 extends the system by introducing **Volume measurement operations** into the application.
 
-This use case ensures that invalid enum values (e.g., `(LengthUnit)999`) are handled gracefully using **domain-level exceptions** instead of low-level runtime errors like `KeyNotFoundException`.
+This use case enables the system to perform:
+- **Comparison** between volume quantities
+- **Conversion** across different volume units
+- **Addition** operations with automatic unit handling
+
+The implementation maintains the same architecture used for Length (UC1–UC8) and Weight (UC9).
+
+### Supported Volume Units
+- **Liter** (L) - Base Unit
+- **Milliliter** (mL) - 1 mL = 0.001 L
+- **Gallon** (gal) - 1 gal = 3.78 L
+
+All calculations are internally normalized using **Liter** as the base unit to ensure consistent and accurate conversions.
 
 ---
 
 ## 🎯 Objectives
 
-- Prevent internal dictionary exceptions
-- Validate enum values before conversion
-- Throw meaningful `ArgumentException` for invalid units
-- Improve domain safety and architectural cleanliness
-- Ensure all tests pass with proper error expectations
+- ✓ Introduce Volume measurement support
+- ✓ Maintain architectural consistency with previous UCs
+- ✓ Enable equality comparison between volume quantities
+- ✓ Support unit conversion across volume units
+- ✓ Implement addition operations between different units
+- ✓ Allow addition with explicit target unit selection
 
 ---
 
-## 🧠 Problem Before UC10
+## 📏 Supported Volume Units
 
-### The Issue
-
-When an invalid unit was passed:
-
-```csharp
-(LengthUnit)999
-```
-
-The system attempted to access a dictionary key directly:
-
-```csharp
-Factors[unit]
-```
-
-This caused:
-
-```
-KeyNotFoundException
-```
-
-### Why This Was Bad
-
-- ❌ Leaks internal implementation details
-- ❌ Breaks clean architecture principles
-- ❌ Fails explicit invalid target unit tests
+| Unit | Symbol | Conversion |
+|------|--------|------------|
+| Liter | L | Base Unit |
+| Milliliter | mL | 1 mL = 0.001 L |
+| Gallon | gal | 1 gal = 3.78 L |
 
 ---
 
-## ✅ Solution Implemented
+## 🏗️ Architectural Design
 
-### 1️⃣ Enum Validation Before Dictionary Access
+UC11 follows the same layered architecture used in earlier use cases, ensuring **consistency** and **maintainability** across the application.
 
-Added validation using:
+### Project Structure
 
-```csharp
-if (!Enum.IsDefined(typeof(LengthUnit), unit))
-    throw new ArgumentException($"Invalid LengthUnit: {unit}");
+```
+QuantityMeasurementApp/
+├── Models/
+│   ├── IMeasurable.cs
+│   ├── VolumeUnit.cs
+│   ├── Quantity.cs
+│   ├── LengthUnit.cs
+│   └── WeightUnit.cs
+├── Services/
+│   ├── IQuantityService.cs
+│   ├── QuantityService.cs
+│   ├── QuantityVolumeService.cs
+│   ├── QuantityLengthService.cs
+│   └── QuantityWeightService.cs
+├── Program.cs
+└── QuantityMeasurementApp.csproj
 ```
 
-Applied to:
-- `LengthUnit`
-- `WeightUnit`
+### Component Responsibilities
 
-### 2️⃣ Controlled Exception Handling
-
-When an invalid unit is passed:
-
-```csharp
-(LengthUnit)999
-```
-
-The system now throws:
-
-```csharp
-ArgumentException: Invalid LengthUnit: 999
-```
-
-**Benefits:**
-- ✔️ Clean and predictable
-- ✔️ Test-aligned expectations
-- ✔️ Domain-driven design
-- ✔️ Self-documenting
-
+| Component | Responsibility |
+|-----------|-----------------|
+| **VolumeUnit.cs** | Defines supported volume units |
+| **QuantityVolumeService.cs** | Handles comparison, conversion, and addition |
+| **Program.cs** | Provides console-based interaction |
+| **Tests** | Verifies system correctness |
 ---
 
-## 🏗️ Architectural Improvement
+## ⚙️ Core Functionalities
 
-### Before UC10
+### 1️⃣ Volume Equality Comparison
+
+Determines if two quantities represent the same volume.
+
+**Examples:**
+- `1 Liter == 1000 Milliliter` → ✅ True
+- `1 Gallon == 3.78 Liter` → ✅ True
+
+### 2️⃣ Volume Conversion
+
+Converts volume from one unit to another, normalizing internally through the base unit.
+
+**Examples:**
+- `2 Liter` → `2000 Milliliter`
+- `1 Gallon` → `3.78 Liter`
+
+### 3️⃣ Addition of Volumes
+
+Adds two volume quantities and returns the result in the unit of the first operand.
+
+**Examples:**
+- `1 Liter + 500 Milliliter` = `1.5 Liter`
+- `2 Liter + 1000 Milliliter` = `3 Liter`
+
+### 4️⃣ Addition with Target Unit
+
+Allows addition of two quantities while specifying a desired output unit.
+
+**Examples:**
+- `1 Liter + 1 Gallon` → `4.78 Liter`
+- `1 Liter + 1 Gallon` → `4780 Milliliter`
+---
+
+## 🔄 Internal Conversion Strategy
+
+All operations follow a **two-step normalization process** for accuracy and consistency:
 
 ```
-Enum → Dictionary Access → Runtime Crash (KeyNotFoundException)
+Input Value → Convert to Base Unit (Liter) → Convert to Target Unit
 ```
 
-### After UC10
+### Example: 1 Gallon + 500 Milliliter
 
-```
-Enum → Validation Layer → Controlled Domain Exception (ArgumentException)
-```
+**Step 1: Normalize to Base Unit (Liter)**
+- 1 Gallon → 3.78 Liter
+- 500 mL → 0.5 Liter
 
-This ensures the model layer does **not leak implementation details**.
+**Step 2: Perform Calculation**
+- 3.78 + 0.5 = **4.28 Liter**
 
 ---
 
 ## 🧪 Test Coverage
 
-UC10 ensures the following test categories pass:
+UC11 introduces comprehensive tests for the Volume service layer, following the same testing patterns established in previous use cases.
 
-- ✅ Invalid explicit target unit
-- ✅ Invalid conversion unit
-- ✅ Invalid addition target unit
-- ✅ All existing equality and addition tests
+### Covered Scenarios
 
-### Test Results
+- ✅ Equality comparison between units
+- ✅ Liter to Milliliter conversion
+- ✅ Gallon to Liter conversion
+- ✅ Addition across different units
+- ✅ Addition with explicit target unit
+- ✅ Validation for invalid units
 
-| Metric | Count |
-|--------|-------|
-| **Total Tests** | 42 |
-| **Passed** | 42 |
-| **Failed** | 0 |
+### Example Test Cases
 
+| Test Case | Expected Result |
+|-----------|-----------------|
+| 1 Liter == 1000 Milliliter | ✅ True |
+| 1 Gallon == 3.78 Liter | ✅ True |
+| 1 Liter + 500 Milliliter = 1.5 Liter | ✅ True |
 ---
 
 ## 🔒 Design Principles Applied
 
-1. **Defensive Programming** - Validate inputs early
-2. **Fail Fast Strategy** - Detect errors at domain level
-3. **Clean Exception Boundaries** - Use domain exceptions, not framework errors
-4. **Encapsulation** - Hide internal data structures
-5. **Domain-Level Validation** - Business logic owns validation
+UC11 continues to follow the same **architectural principles** established in previous use cases, ensuring code quality and maintainability.
+
+| Principle | Description |
+|-----------|-------------|
+| **Single Responsibility** | Each service handles a single measurement category |
+| **Consistency Across Modules** | Volume logic mirrors Length and Weight services |
+| **Extensibility** | New measurement categories can be added easily |
+| **Encapsulation** | Conversion logic is contained inside service classes |
+| **Domain Normalization** | All operations rely on a common base unit |
 
 ---
 
 ## 🚀 Outcome
 
-UC10 makes the system:
+UC11 enhances the application by introducing **volume measurement capabilities** while maintaining a clean and scalable architecture.
 
-- 🔧 **More Stable** - Predictable error handling
-- 📚 **More Maintainable** - Clear validation boundaries
-- 🏭 **Production-Ready** - Handles edge cases gracefully
-- 🎓 **Interview-Ready** - Demonstrates architectural best practices
-- 🏛️ **Architecturally Sound** - Follows SOLID principles
+The system is now capable of handling:
+- 📏 **Length Measurements** (Feet, Inch, Yard, Centimeter)
+- ⚖️ **Weight Measurements** (Kilogram, Gram, Pound)
+- 🧪 **Volume Measurements** (Liter, Milliliter, Gallon)
+
+### ✅ System Capability After UC11
+
+| Measurement Type | Units Supported |
+|------------------|-----------------|
+| **Length** | Feet, Inch, Yard, Centimeter |
+| **Weight** | Kilogram, Gram, Pound |
+| **Volume** | Liter, Milliliter, Gallon |
+
+This expansion demonstrates how the architecture supports **incremental feature growth** without modifying existing logic, reinforcing strong software design practices.
