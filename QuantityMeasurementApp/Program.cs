@@ -6,26 +6,23 @@ namespace QuantityMeasurementApp
 {
     internal class Program
     {
-        // Entry point of the application
         static void Main(string[] args)
         {
-            // Create service objects for Length, Weight and Volume
             QuantityLengthService lengthService = new QuantityLengthService();
             QuantityWeightService weightService = new QuantityWeightService();
             QuantityVolumeService volumeService = new QuantityVolumeService();
 
-            // Main application loop
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("=================================");
-                Console.WriteLine("  Quantity Measurement  (UC11)");
+                Console.WriteLine("   Quantity Measurement System");
                 Console.WriteLine("=================================");
-                Console.WriteLine("1. Length Operations (UC1–UC8)");
-                Console.WriteLine("2. Weight Operations (UC9)");
-                Console.WriteLine("3. Volume Operations (UC11)");
+                Console.WriteLine("1. Length Operations");
+                Console.WriteLine("2. Weight Operations");
+                Console.WriteLine("3. Volume Operations");
                 Console.WriteLine("4. Exit");
-                Console.Write("Select an option: ");
+                Console.Write("Select option: ");
 
                 string choice = Console.ReadLine();
 
@@ -41,28 +38,23 @@ namespace QuantityMeasurementApp
                         ShowVolumeMenu(volumeService);
                         break;
                     case "4":
-                        Console.WriteLine("Exiting application...");
                         return;
-                    default:
-                        Console.WriteLine("Invalid choice. Press any key...");
-                        Console.ReadKey();
-                        break;
                 }
             }
         }
 
-        // ===================== LENGTH MENU =====================
+        // ================= LENGTH MENU =================
+
         private static void ShowLengthMenu(QuantityLengthService service)
         {
             Console.Clear();
-            Console.WriteLine("=================================");
-            Console.WriteLine("  Length Operations - UC10");
-            Console.WriteLine("=================================");
-            Console.WriteLine("1. Compare Two Lengths");
+            Console.WriteLine("==== Length Operations ====");
+            Console.WriteLine("1. Compare Lengths");
             Console.WriteLine("2. Convert Length");
-            Console.WriteLine("3. Add Two Lengths");
-            Console.WriteLine("4. Add Two Lengths (Specify Target Unit)");
-            Console.Write("Select an option: ");
+            Console.WriteLine("3. Add Lengths");
+            Console.WriteLine("4. Add Lengths (Target Unit)");
+            Console.WriteLine("5. Subtract Lengths");
+            Console.WriteLine("6. Divide Lengths");
 
             string choice = Console.ReadLine();
 
@@ -72,135 +64,23 @@ namespace QuantityMeasurementApp
                 case "2": ConvertLength(service); break;
                 case "3": AddLengths(service); break;
                 case "4": AddLengthsWithTarget(service); break;
-                default:
-                    Console.WriteLine("Invalid choice.");
-                    Pause();
-                    break;
+                case "5": SubtractLengths(); break;
+                case "6": DivideLengths(); break;
             }
         }
 
-        // ===================== LENGTH OPERATIONS =====================
+        // ================= WEIGHT MENU =================
 
-        private static void CompareLengths(QuantityLengthService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadLengthUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadLengthUnit();
-
-                bool result = service.AreEqual(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"Result: {(result ? "Equal (True)" : "Not Equal (False)")}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void ConvertLength(QuantityLengthService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter Quantity to Convert:");
-                double value = ReadDouble("Value: ");
-                LengthUnit sourceUnit = ReadLengthUnit();
-
-                Console.WriteLine("\nConvert To:");
-                LengthUnit targetUnit = ReadLengthUnit();
-
-                double result = service.Convert(value, sourceUnit, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value} {sourceUnit} = {result} {targetUnit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void AddLengths(QuantityLengthService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadLengthUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadLengthUnit();
-
-                Quantity<LengthUnit> result =
-                    service.Add(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void AddLengthsWithTarget(QuantityLengthService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                LengthUnit unit1 = ReadLengthUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                LengthUnit unit2 = ReadLengthUnit();
-
-                Console.WriteLine("\nSelect Target Unit:");
-                LengthUnit targetUnit = ReadLengthUnit();
-
-                Quantity<LengthUnit> result =
-                    service.Add(value1, unit1, value2, unit2, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        // ===================== WEIGHT MENU =====================
         private static void ShowWeightMenu(QuantityWeightService service)
         {
             Console.Clear();
-            Console.WriteLine("=================================");
-            Console.WriteLine("  Weight Operations - UC10");
-            Console.WriteLine("=================================");
-            Console.WriteLine("1. Compare Two Weights");
+            Console.WriteLine("==== Weight Operations ====");
+            Console.WriteLine("1. Compare Weights");
             Console.WriteLine("2. Convert Weight");
-            Console.WriteLine("3. Add Two Weights");
-            Console.WriteLine("4. Add Two Weights (Specify Target Unit)");
-            Console.Write("Select an option: ");
+            Console.WriteLine("3. Add Weights");
+            Console.WriteLine("4. Add Weights (Target Unit)");
+            Console.WriteLine("5. Subtract Weights");
+            Console.WriteLine("6. Divide Weights");
 
             string choice = Console.ReadLine();
 
@@ -210,135 +90,23 @@ namespace QuantityMeasurementApp
                 case "2": ConvertWeight(service); break;
                 case "3": AddWeights(service); break;
                 case "4": AddWeightsWithTarget(service); break;
-                default:
-                    Console.WriteLine("Invalid choice.");
-                    Pause();
-                    break;
+                case "5": SubtractWeights(); break;
+                case "6": DivideWeights(); break;
             }
         }
 
-        // ===================== WEIGHT OPERATIONS =====================
+        // ================= VOLUME MENU =================
 
-        private static void CompareWeights(QuantityWeightService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                WeightUnit unit1 = ReadWeightUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                WeightUnit unit2 = ReadWeightUnit();
-
-                bool result = service.AreEqual(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"Result: {(result ? "Equal (True)" : "Not Equal (False)")}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void ConvertWeight(QuantityWeightService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter Quantity to Convert:");
-                double value = ReadDouble("Value: ");
-                WeightUnit sourceUnit = ReadWeightUnit();
-
-                Console.WriteLine("\nConvert To:");
-                WeightUnit targetUnit = ReadWeightUnit();
-
-                double result = service.Convert(value, sourceUnit, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value} {sourceUnit} = {result} {targetUnit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void AddWeights(QuantityWeightService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                WeightUnit unit1 = ReadWeightUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                WeightUnit unit2 = ReadWeightUnit();
-
-                Quantity<WeightUnit> result =
-                    service.Add(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        private static void AddWeightsWithTarget(QuantityWeightService service)
-        {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                WeightUnit unit1 = ReadWeightUnit();
-
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                WeightUnit unit2 = ReadWeightUnit();
-
-                Console.WriteLine("\nSelect Target Unit:");
-                WeightUnit targetUnit = ReadWeightUnit();
-
-                Quantity<WeightUnit> result =
-                    service.Add(value1, unit1, value2, unit2, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Pause();
-        }
-
-        // ===================== VOLUME MENU =====================
         private static void ShowVolumeMenu(QuantityVolumeService service)
         {
             Console.Clear();
-            Console.WriteLine("=================================");
-            Console.WriteLine("  Volume Operations - UC11");
-            Console.WriteLine("=================================");
-            Console.WriteLine("1. Compare Two Volumes");
+            Console.WriteLine("==== Volume Operations ====");
+            Console.WriteLine("1. Compare Volumes");
             Console.WriteLine("2. Convert Volume");
-            Console.WriteLine("3. Add Two Volumes");
-            Console.WriteLine("4. Add Two Volumes (Specify Target Unit)");
-            Console.Write("Select an option: ");
+            Console.WriteLine("3. Add Volumes");
+            Console.WriteLine("4. Add Volumes (Target Unit)");
+            Console.WriteLine("5. Subtract Volumes");
+            Console.WriteLine("6. Divide Volumes");
 
             string choice = Console.ReadLine();
 
@@ -348,209 +116,299 @@ namespace QuantityMeasurementApp
                 case "2": ConvertVolume(service); break;
                 case "3": AddVolumes(service); break;
                 case "4": AddVolumesWithTarget(service); break;
-                default:
-                    Console.WriteLine("Invalid choice.");
-                    Pause();
-                    break;
+                case "5": SubtractVolumes(); break;
+                case "6": DivideVolumes(); break;
             }
         }
 
-        // ===================== VOLUME OPERATIONS =====================
+        // ================= LENGTH OPERATIONS =================
+
+        private static void CompareLengths(QuantityLengthService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            LengthUnit u1 = ReadLengthUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            LengthUnit u2 = ReadLengthUnit();
+
+            bool result = service.AreEqual(v1, u1, v2, u2);
+
+            Console.WriteLine($"Result: {result}");
+            Pause();
+        }
+
+        private static void ConvertLength(QuantityLengthService service)
+        {
+            double v = ReadDouble("Enter value: ");
+            LengthUnit s = ReadLengthUnit();
+            LengthUnit t = ReadLengthUnit();
+
+            double result = service.Convert(v, s, t);
+
+            Console.WriteLine($"{v} {s} = {result} {t}");
+            Pause();
+        }
+
+        private static void AddLengths(QuantityLengthService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            LengthUnit u1 = ReadLengthUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            LengthUnit u2 = ReadLengthUnit();
+
+            var result = service.Add(v1, u1, v2, u2);
+
+            Console.WriteLine(result);
+            Pause();
+        }
+
+        private static void AddLengthsWithTarget(QuantityLengthService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            LengthUnit u1 = ReadLengthUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            LengthUnit u2 = ReadLengthUnit();
+
+            LengthUnit target = ReadLengthUnit();
+
+            var result = service.Add(v1, u1, v2, u2, target);
+
+            Console.WriteLine(result);
+            Pause();
+        }
+
+        // UC12
+
+        private static void SubtractLengths()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            LengthUnit u1 = ReadLengthUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            LengthUnit u2 = ReadLengthUnit();
+
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(v1, u1);
+            Quantity<LengthUnit> q2 = new Quantity<LengthUnit>(v2, u2);
+
+            Console.WriteLine(q1.Subtract(q2));
+            Pause();
+        }
+
+        private static void DivideLengths()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            LengthUnit u1 = ReadLengthUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            LengthUnit u2 = ReadLengthUnit();
+
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(v1, u1);
+            Quantity<LengthUnit> q2 = new Quantity<LengthUnit>(v2, u2);
+
+            Console.WriteLine(q1.Divide(q2));
+            Pause();
+        }
+
+        // ================= WEIGHT OPERATIONS =================
+
+        private static void CompareWeights(QuantityWeightService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            WeightUnit u1 = ReadWeightUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            WeightUnit u2 = ReadWeightUnit();
+
+            Console.WriteLine(service.AreEqual(v1, u1, v2, u2));
+            Pause();
+        }
+
+        private static void ConvertWeight(QuantityWeightService service)
+        {
+            double v = ReadDouble("Enter value: ");
+            WeightUnit s = ReadWeightUnit();
+            WeightUnit t = ReadWeightUnit();
+
+            Console.WriteLine(service.Convert(v, s, t));
+            Pause();
+        }
+
+        private static void AddWeights(QuantityWeightService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            WeightUnit u1 = ReadWeightUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            WeightUnit u2 = ReadWeightUnit();
+
+            Console.WriteLine(service.Add(v1, u1, v2, u2));
+            Pause();
+        }
+
+        private static void AddWeightsWithTarget(QuantityWeightService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            WeightUnit u1 = ReadWeightUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            WeightUnit u2 = ReadWeightUnit();
+
+            WeightUnit t = ReadWeightUnit();
+
+            Console.WriteLine(service.Add(v1, u1, v2, u2, t));
+            Pause();
+        }
+
+        // UC12
+
+        private static void SubtractWeights()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            WeightUnit u1 = ReadWeightUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            WeightUnit u2 = ReadWeightUnit();
+
+            Quantity<WeightUnit> q1 = new Quantity<WeightUnit>(v1, u1);
+            Quantity<WeightUnit> q2 = new Quantity<WeightUnit>(v2, u2);
+
+            Console.WriteLine(q1.Subtract(q2));
+            Pause();
+        }
+
+        private static void DivideWeights()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            WeightUnit u1 = ReadWeightUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            WeightUnit u2 = ReadWeightUnit();
+
+            Quantity<WeightUnit> q1 = new Quantity<WeightUnit>(v1, u1);
+            Quantity<WeightUnit> q2 = new Quantity<WeightUnit>(v2, u2);
+
+            Console.WriteLine(q1.Divide(q2));
+            Pause();
+        }
+
+        // ================= VOLUME OPERATIONS =================
 
         private static void CompareVolumes(QuantityVolumeService service)
         {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                VolumeUnit unit1 = ReadVolumeUnit();
+            double v1 = ReadDouble("Enter first value: ");
+            VolumeUnit u1 = ReadVolumeUnit();
 
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                VolumeUnit unit2 = ReadVolumeUnit();
+            double v2 = ReadDouble("Enter second value: ");
+            VolumeUnit u2 = ReadVolumeUnit();
 
-                bool result = service.AreEqual(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"Result: {(result ? "Equal (True)" : "Not Equal (False)")}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
+            Console.WriteLine(service.AreEqual(v1, u1, v2, u2));
             Pause();
         }
 
         private static void ConvertVolume(QuantityVolumeService service)
         {
-            try
-            {
-                Console.WriteLine("\nEnter Quantity to Convert:");
-                double value = ReadDouble("Value: ");
-                VolumeUnit sourceUnit = ReadVolumeUnit();
+            double v = ReadDouble("Enter value: ");
+            VolumeUnit s = ReadVolumeUnit();
+            VolumeUnit t = ReadVolumeUnit();
 
-                Console.WriteLine("\nConvert To:");
-                VolumeUnit targetUnit = ReadVolumeUnit();
-
-                double result = service.Convert(value, sourceUnit, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value} {sourceUnit} = {result} {targetUnit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
+            Console.WriteLine(service.Convert(v, s, t));
             Pause();
         }
 
         private static void AddVolumes(QuantityVolumeService service)
         {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                VolumeUnit unit1 = ReadVolumeUnit();
+            double v1 = ReadDouble("Enter first value: ");
+            VolumeUnit u1 = ReadVolumeUnit();
 
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                VolumeUnit unit2 = ReadVolumeUnit();
+            double v2 = ReadDouble("Enter second value: ");
+            VolumeUnit u2 = ReadVolumeUnit();
 
-                Quantity<VolumeUnit> result =
-                    service.Add(value1, unit1, value2, unit2);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
+            Console.WriteLine(service.Add(v1, u1, v2, u2));
             Pause();
         }
 
         private static void AddVolumesWithTarget(QuantityVolumeService service)
         {
-            try
-            {
-                Console.WriteLine("\nEnter First Quantity:");
-                double value1 = ReadDouble("Value: ");
-                VolumeUnit unit1 = ReadVolumeUnit();
+            double v1 = ReadDouble("Enter first value: ");
+            VolumeUnit u1 = ReadVolumeUnit();
 
-                Console.WriteLine("\nEnter Second Quantity:");
-                double value2 = ReadDouble("Value: ");
-                VolumeUnit unit2 = ReadVolumeUnit();
+            double v2 = ReadDouble("Enter second value: ");
+            VolumeUnit u2 = ReadVolumeUnit();
 
-                Console.WriteLine("\nSelect Target Unit:");
-                VolumeUnit targetUnit = ReadVolumeUnit();
+            VolumeUnit t = ReadVolumeUnit();
 
-                Quantity<VolumeUnit> result =
-                    service.Add(value1, unit1, value2, unit2, targetUnit);
-
-                Console.WriteLine("\n---------------------------------");
-                Console.WriteLine($"{value1} {unit1} + {value2} {unit2} = {result.Value} {result.Unit}");
-                Console.WriteLine("---------------------------------");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
+            Console.WriteLine(service.Add(v1, u1, v2, u2, t));
             Pause();
         }
 
-        // ===================== INPUT HELPERS =====================
+        // UC12
+
+        private static void SubtractVolumes()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            VolumeUnit u1 = ReadVolumeUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            VolumeUnit u2 = ReadVolumeUnit();
+
+            Quantity<VolumeUnit> q1 = new Quantity<VolumeUnit>(v1, u1);
+            Quantity<VolumeUnit> q2 = new Quantity<VolumeUnit>(v2, u2);
+
+            Console.WriteLine(q1.Subtract(q2));
+            Pause();
+        }
+
+        private static void DivideVolumes()
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            VolumeUnit u1 = ReadVolumeUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            VolumeUnit u2 = ReadVolumeUnit();
+
+            Quantity<VolumeUnit> q1 = new Quantity<VolumeUnit>(v1, u1);
+            Quantity<VolumeUnit> q2 = new Quantity<VolumeUnit>(v2, u2);
+
+            Console.WriteLine(q1.Divide(q2));
+            Pause();
+        }
+
+        // ================= INPUT HELPERS =================
 
         private static LengthUnit ReadLengthUnit()
         {
-            while (true)
-            {
-                Console.WriteLine("Select Unit:");
-                Console.WriteLine("1. Feet");
-                Console.WriteLine("2. Inch");
-                Console.WriteLine("3. Yard");
-                Console.WriteLine("4. Centimeter");
-                Console.Write("Choice: ");
-
-                string input = Console.ReadLine();
-
-                switch (input)
-                {
-                    case "1": return LengthUnit.Feet;
-                    case "2": return LengthUnit.Inch;
-                    case "3": return LengthUnit.Yard;
-                    case "4": return LengthUnit.Centimeter;
-                    default:
-                        Console.WriteLine("Invalid unit selection. Try again.");
-                        break;
-                }
-            }
+            Console.WriteLine("Select Length Unit:");
+            Console.WriteLine("1. Feet");
+            Console.WriteLine("2. Inch");
+            Console.WriteLine("3. Centimeter");
+            Console.WriteLine("4. Yard");
+            return (LengthUnit)(int.Parse(Console.ReadLine()) - 1);
         }
 
         private static WeightUnit ReadWeightUnit()
         {
-            while (true)
-            {
-                Console.WriteLine("Select Unit:");
-                Console.WriteLine("1. Kilogram");
-                Console.WriteLine("2. Gram");
-                Console.WriteLine("3. Pound");
-                Console.Write("Choice: ");
-
-                string input = Console.ReadLine();
-
-                switch (input)
-                {
-                    case "1": return WeightUnit.Kilogram;
-                    case "2": return WeightUnit.Gram;
-                    case "3": return WeightUnit.Pound;
-                    default:
-                        Console.WriteLine("Invalid unit selection. Try again.");
-                        break;
-                }
-            }
+            Console.WriteLine("Select Weight Unit:");
+            Console.WriteLine("1. Kilogram");
+            Console.WriteLine("2. Gram");
+            Console.WriteLine("3. Pound");
+            return (WeightUnit)(int.Parse(Console.ReadLine()) - 1);
         }
 
         private static VolumeUnit ReadVolumeUnit()
         {
-            while (true)
-            {
-                Console.WriteLine("Select Unit:");
-                Console.WriteLine("1. Liter");
-                Console.WriteLine("2. Milliliter");
-                Console.WriteLine("3. Gallon");
-                Console.Write("Choice: ");
-
-                string input = Console.ReadLine();
-
-                switch (input)
-                {
-                    case "1": return VolumeUnit.Litre;
-                    case "2": return VolumeUnit.Millilitre;
-                    case "3": return VolumeUnit.Gallon;
-                    default:
-                        Console.WriteLine("Invalid unit selection. Try again.");
-                        break;
-                }
-            }
+            Console.WriteLine("Select Volume Unit:");
+            Console.WriteLine("1. Litre");
+            Console.WriteLine("2. Millilitre");
+            Console.WriteLine("3. Gallon");
+            return (VolumeUnit)(int.Parse(Console.ReadLine()) - 1);
         }
 
         private static double ReadDouble(string message)
         {
-            while (true)
-            {
-                Console.Write(message);
-                if (double.TryParse(Console.ReadLine(), out double value))
-                    return value;
-
-                Console.WriteLine("Invalid number. Please try again.");
-            }
+            Console.Write(message);
+            return double.Parse(Console.ReadLine());
         }
 
         private static void Pause()

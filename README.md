@@ -1,49 +1,51 @@
-# QuantityMeasurementApp – UC11 Volume Measurement Support
+# QuantityMeasurementApp – UC12 Arithmetic Operations (Subtract & Divide)
 
 ## 📋 Overview
 
-UC11 extends the system by introducing **Volume measurement operations** into the application.
+UC12 extends the system by introducing **additional arithmetic operations** for measurement quantities.
 
 This use case enables the system to perform:
-- **Comparison** between volume quantities
-- **Conversion** across different volume units
-- **Addition** operations with automatic unit handling
+- **Subtraction** between quantities
+- **Division** between quantities
 
-The implementation maintains the same architecture used for Length (UC1–UC8) and Weight (UC9).
+These operations are supported for all existing measurement categories:
+- 📏 **Length**
+- ⚖️ **Weight**
+- 🧪 **Volume**
 
-### Supported Volume Units
-- **Liter** (L) - Base Unit
-- **Milliliter** (mL) - 1 mL = 0.001 L
-- **Gallon** (gal) - 1 gal = 3.78 L
+The implementation builds on the architecture established in earlier use cases and maintains full compatibility with the existing service-based design.
 
-All calculations are internally normalized using **Liter** as the base unit to ensure consistent and accurate conversions.
+All operations internally normalize values using their respective base units, ensuring **consistent and accurate calculations** across different units.
 
 ---
 
 ## 🎯 Objectives
 
-- ✓ Introduce Volume measurement support
-- ✓ Maintain architectural consistency with previous UCs
-- ✓ Enable equality comparison between volume quantities
-- ✓ Support unit conversion across volume units
-- ✓ Implement addition operations between different units
-- ✓ Allow addition with explicit target unit selection
+- ✓ Introduce subtraction operations for measurement quantities
+- ✓ Introduce division operations for measurement quantities
+- ✓ Support arithmetic across different units within the same category
+- ✓ Maintain architectural consistency with UC1–UC11
+- ✓ Ensure calculations remain accurate through base unit normalization
+- ✓ Extend the system without modifying existing functionality
 
 ---
 
-## 📏 Supported Volume Units
+## 📏 Supported Measurement Categories
 
-| Unit | Symbol | Conversion |
-|------|--------|------------|
-| Liter | L | Base Unit |
-| Milliliter | mL | 1 mL = 0.001 L |
-| Gallon | gal | 1 gal = 3.78 L |
+UC12 enables arithmetic operations across all supported measurement types.
 
+| Measurement Type | Base Unit | Supported Units |
+|------------------|-----------|------------------|
+| **Length** | Feet | Feet, Inch, Yard, Centimeter |
+| **Weight** | Kilogram | Kilogram, Gram, Pound |
+| **Volume** | Liter | Liter, Milliliter, Gallon |
 ---
 
 ## 🏗️ Architectural Design
 
-UC11 follows the same layered architecture used in earlier use cases, ensuring **consistency** and **maintainability** across the application.
+UC12 integrates seamlessly into the existing layered architecture used throughout the application.
+
+No structural changes were required. Instead, additional arithmetic methods were introduced within the service layer.
 
 ### Project Structure
 
@@ -51,16 +53,16 @@ UC11 follows the same layered architecture used in earlier use cases, ensuring *
 QuantityMeasurementApp/
 ├── Models/
 │   ├── IMeasurable.cs
-│   ├── VolumeUnit.cs
 │   ├── Quantity.cs
 │   ├── LengthUnit.cs
-│   └── WeightUnit.cs
+│   ├── WeightUnit.cs
+│   └── VolumeUnit.cs
 ├── Services/
 │   ├── IQuantityService.cs
 │   ├── QuantityService.cs
-│   ├── QuantityVolumeService.cs
 │   ├── QuantityLengthService.cs
-│   └── QuantityWeightService.cs
+│   ├── QuantityWeightService.cs
+│   └── QuantityVolumeService.cs
 ├── Program.cs
 └── QuantityMeasurementApp.csproj
 ```
@@ -68,118 +70,114 @@ QuantityMeasurementApp/
 ### Component Responsibilities
 
 | Component | Responsibility |
-|-----------|-----------------|
-| **VolumeUnit.cs** | Defines supported volume units |
-| **QuantityVolumeService.cs** | Handles comparison, conversion, and addition |
-| **Program.cs** | Provides console-based interaction |
-| **Tests** | Verifies system correctness |
+|-----------|----------------|
+| **Quantity.cs** | Defines the generic quantity model and arithmetic behavior |
+| **Service Classes** | Perform measurement operations using base unit normalization |
+| **Program.cs** | Provides console-based user interaction |
+| **Tests** | Validate correctness of arithmetic operations |
 ---
 
 ## ⚙️ Core Functionalities
 
-### 1️⃣ Volume Equality Comparison
+### 1️⃣ Subtraction of Quantities
 
-Determines if two quantities represent the same volume.
-
-**Examples:**
-- `1 Liter == 1000 Milliliter` → ✅ True
-- `1 Gallon == 3.78 Liter` → ✅ True
-
-### 2️⃣ Volume Conversion
-
-Converts volume from one unit to another, normalizing internally through the base unit.
+Allows subtraction between two measurement quantities even when they are expressed in different units.
 
 **Examples:**
-- `2 Liter` → `2000 Milliliter`
-- `1 Gallon` → `3.78 Liter`
+- `2 Feet − 12 Inch` → `1 Feet`
+- `5 Kilogram − 500 Gram` → `4.5 Kilogram`
+- `2 Liter − 500 Milliliter` → `1.5 Liter`
 
-### 3️⃣ Addition of Volumes
+The result is returned in the unit of the **first operand**, ensuring consistent behavior across all operations.
 
-Adds two volume quantities and returns the result in the unit of the first operand.
+### 2️⃣ Division of Quantities
 
-**Examples:**
-- `1 Liter + 500 Milliliter` = `1.5 Liter`
-- `2 Liter + 1000 Milliliter` = `3 Liter`
-
-### 4️⃣ Addition with Target Unit
-
-Allows addition of two quantities while specifying a desired output unit.
+Divides one quantity by another quantity of the same measurement category.
 
 **Examples:**
-- `1 Liter + 1 Gallon` → `4.78 Liter`
-- `1 Liter + 1 Gallon` → `4780 Milliliter`
+- `10 Feet ÷ 2 Feet` → `5`
+- `4 Kilogram ÷ 500 Gram` → `8`
+- `2 Liter ÷ 500 Milliliter` → `4`
+
+Division produces a **dimensionless numeric result**, representing the ratio between the two quantities.
+
 ---
 
 ## 🔄 Internal Conversion Strategy
 
-All operations follow a **two-step normalization process** for accuracy and consistency:
+All arithmetic operations follow the same **normalization workflow** used in previous use cases:
 
 ```
-Input Value → Convert to Base Unit (Liter) → Convert to Target Unit
+Input Value → Convert to Base Unit → Perform Calculation → Convert to Result Unit
 ```
 
-### Example: 1 Gallon + 500 Milliliter
+### Example: 2 Liter − 500 Milliliter
 
-**Step 1: Normalize to Base Unit (Liter)**
-- 1 Gallon → 3.78 Liter
-- 500 mL → 0.5 Liter
+**Step 1: Convert to Base Unit (Liter)**
+- `2 Liter` → `2 Liter`
+- `500 Milliliter` → `0.5 Liter`
 
 **Step 2: Perform Calculation**
-- 3.78 + 0.5 = **4.28 Liter**
-
+- `2 − 0.5 = 1.5 Liter`
 ---
 
 ## 🧪 Test Coverage
 
-UC11 introduces comprehensive tests for the Volume service layer, following the same testing patterns established in previous use cases.
+UC12 expands the existing test suite to validate subtraction and division operations across all measurement categories.
 
 ### Covered Scenarios
 
-- ✅ Equality comparison between units
-- ✅ Liter to Milliliter conversion
-- ✅ Gallon to Liter conversion
-- ✅ Addition across different units
-- ✅ Addition with explicit target unit
-- ✅ Validation for invalid units
+- ✅ Subtraction between different units
+- ✅ Subtraction returning correct result unit
+- ✅ Division between quantities
+- ✅ Division producing correct ratio
+- ✅ Handling of invalid unit inputs
+- ✅ Validation against edge cases
 
 ### Example Test Cases
 
 | Test Case | Expected Result |
-|-----------|-----------------|
-| 1 Liter == 1000 Milliliter | ✅ True |
-| 1 Gallon == 3.78 Liter | ✅ True |
-| 1 Liter + 500 Milliliter = 1.5 Liter | ✅ True |
+|-----------|----------------|
+| `2 Feet − 12 Inch` | `1 Feet` |
+| `5 Kilogram − 500 Gram` | `4.5 Kilogram` |
+| `2 Liter − 500 Milliliter` | `1.5 Liter` |
+| `10 Feet ÷ 2 Feet` | `5` |
+| `4 Kilogram ÷ 500 Gram` | `8` |
 ---
 
 ## 🔒 Design Principles Applied
 
-UC11 continues to follow the same **architectural principles** established in previous use cases, ensuring code quality and maintainability.
+UC12 continues to follow the same **core software engineering principles** used throughout the project.
 
 | Principle | Description |
 |-----------|-------------|
-| **Single Responsibility** | Each service handles a single measurement category |
-| **Consistency Across Modules** | Volume logic mirrors Length and Weight services |
-| **Extensibility** | New measurement categories can be added easily |
-| **Encapsulation** | Conversion logic is contained inside service classes |
-| **Domain Normalization** | All operations rely on a common base unit |
-
+| **Consistency** | Arithmetic operations follow the same logic across all measurement types |
+| **Single Responsibility** | Service classes handle only their respective measurement categories |
+| **Extensibility** | Additional operations can be introduced without modifying existing logic |
+| **Reusability** | Base unit conversion logic is reused across all services |
+| **Domain Normalization** | Calculations are performed using base units for accuracy |
 ---
 
 ## 🚀 Outcome
 
-UC11 enhances the application by introducing **volume measurement capabilities** while maintaining a clean and scalable architecture.
+UC12 enhances the system by introducing **full arithmetic capability** across measurement quantities.
 
-The system is now capable of handling:
-- 📏 **Length Measurements** (Feet, Inch, Yard, Centimeter)
-- ⚖️ **Weight Measurements** (Kilogram, Gram, Pound)
-- 🧪 **Volume Measurements** (Liter, Milliliter, Gallon)
+The application now supports:
+- 📏 **Length Measurements**
+- ⚖️ **Weight Measurements**
+- 🧪 **Volume Measurements**
+- ➕ **Addition**
+- ➖ **Subtraction**
+- ➗ **Division**
+- 🔄 **Unit Conversion**
+- ✔️ **Equality Comparison**
 
-### ✅ System Capability After UC11
+### ✅ System Capability After UC12
 
-| Measurement Type | Units Supported |
-|------------------|-----------------|
-| **Length** | Feet, Inch, Yard, Centimeter |
-| **Weight** | Kilogram, Gram, Pound |
-| **Volume** | Liter, Milliliter, Gallon |
+| Measurement Type | Operations Supported |
+|------------------|---------------------|
+| **Length** | Compare, Convert, Add, Subtract, Divide |
+| **Weight** | Compare, Convert, Add, Subtract, Divide |
+| **Volume** | Compare, Convert, Add, Subtract, Divide |
 
-This expansion demonstrates how the architecture supports **incremental feature growth** without modifying existing logic, reinforcing strong software design practices.
+This use case demonstrates the **scalability** of the system architecture, allowing new operations to be integrated seamlessly without affecting previously implemented functionality.
