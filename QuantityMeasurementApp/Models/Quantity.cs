@@ -3,181 +3,195 @@ using System;
 namespace QuantityMeasurementApp.Models
 {
     /// <summary>
-    /// Generic Quantity class supporting any unit category.
-    /// Supports conversion, addition, subtraction and division.
-    /// U must be Enum (LengthUnit, WeightUnit, etc.)
+    /// Generic Quantity class representing a measurable quantity.
+    /// Works with LengthUnit, WeightUnit, VolumeUnit etc.
     /// </summary>
-    public sealed class Quantity<U> where U : Enum
+    public class Quantity<U> where U : Enum
     {
         public double Value { get; }
         public U Unit { get; }
 
-        /// <summary>
-        /// Constructor validates value and unit.
-        /// Ensures immutability.
-        /// </summary>
         public Quantity(double value, U unit)
         {
-            if (!double.IsFinite(value))
-                throw new ArgumentException("Value must be finite.");
-
             Value = value;
-            Unit = unit ?? throw new ArgumentNullException(nameof(unit));
+            Unit = unit;
         }
 
         // ==========================================================
-        // UC5–UC11: CONVERSION
+        // UC13 – ENUM FOR ARITHMETIC OPERATIONS
         // ==========================================================
 
         /// <summary>
-        /// Converts quantity to target unit.
+        /// Enum used to dispatch arithmetic operations
+        /// without using if-else or switch statements.
         /// </summary>
-        public Quantity<U> ConvertTo(U targetUnit)
+        private enum ArithmeticOperation
         {
-            double baseValue = ConvertToBase(Value, Unit);
-            double converted = ConvertFromBase(baseValue, targetUnit);
-
-            return new Quantity<U>(Math.Round(converted, 4), targetUnit);
+            ADD,
+            SUBTRACT,
+            DIVIDE
         }
 
         // ==========================================================
-        // UC6–UC11: ADDITION
+        // UC13 – VALIDATION HELPER
         // ==========================================================
 
         /// <summary>
-        /// Adds two quantities and returns result in first unit.
+        /// Centralized validation for arithmetic operations.
+        /// Ensures consistent validation across add/subtract/divide.
+        /// </summary>
+        private void ValidateArithmeticOperands(Quantity<U> other)
+        {
+            if (other == null)
+                throw new ArgumentException("Operand quantity cannot be null.");
+
+            if (!double.IsFinite(Value) || !double.IsFinite(other.Value))
+                throw new ArgumentException("Quantity values must be finite numbers.");
+
+            // Ensure both quantities belong to same measurement category
+            if (Unit.GetType() != other.Unit.GetType())
+                throw new ArgumentException("Cannot operate on quantities of different categories.");
+        }
+
+        // ==========================================================
+        // UC13 – CORE ARITHMETIC HELPER
+        // ==========================================================
+
+        /// <summary>
+        /// Performs arithmetic in BASE UNITS.
+        /// All arithmetic operations delegate here.
+        /// </summary>
+        private double PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)
+        {
+            ValidateArithmeticOperands(other);
+
+            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+            IMeasurable otherUnit = (IMeasurable)(object)other.Unit;
+
+            // Convert both values to base unit
+            double baseValue1 = thisUnit.ConvertToBase(Value);
+            double baseValue2 = otherUnit.ConvertToBase(other.Value);
+
+            switch (operation)
+            {
+                case ArithmeticOperation.ADD:
+                    return baseValue1 + baseValue2;
+
+                case ArithmeticOperation.SUBTRACT:
+                    return baseValue1 - baseValue2;
+
+                case ArithmeticOperation.DIVIDE:
+
+                    if (baseValue2 == 0)
+                        throw new ArithmeticException("Division by zero is not allowed.");
+
+                    return baseValue1 / baseValue2;
+
+                default:
+                    throw new InvalidOperationException("Unsupported arithmetic operation.");
+            }
+        }
+
+        // ==========================================================
+        // UC13 – ADD OPERATIONS
+        // ==========================================================
+
+        /// <summary>
+        /// Adds two quantities and returns result in first operand unit.
         /// </summary>
         public Quantity<U> Add(Quantity<U> other)
-            => Add(other, this.Unit);
+        {
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
+
+            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+
+            double result = thisUnit.ConvertFromBase(baseResult);
+
+            return new Quantity<U>(RoundToTwoDecimals(result), Unit);
+        }
 
         /// <summary>
         /// Adds two quantities and returns result in target unit.
         /// </summary>
         public Quantity<U> Add(Quantity<U> other, U targetUnit)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
 
-            double base1 = ConvertToBase(this.Value, this.Unit);
-            double base2 = ConvertToBase(other.Value, other.Unit);
+            IMeasurable target = (IMeasurable)(object)targetUnit;
 
-            double sumBase = base1 + base2;
-            double result = ConvertFromBase(sumBase, targetUnit);
+            double result = target.ConvertFromBase(baseResult);
 
-            return new Quantity<U>(Math.Round(result, 4), targetUnit);
+            return new Quantity<U>(RoundToTwoDecimals(result), targetUnit);
         }
 
         // ==========================================================
-        // UC12: SUBTRACTION
+        // UC13 – SUBTRACT OPERATIONS
         // ==========================================================
 
-        /// <summary>
-        /// Subtracts another quantity and returns result in first unit.
-        /// </summary>
         public Quantity<U> Subtract(Quantity<U> other)
-            => Subtract(other, this.Unit);
+        {
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-        /// <summary>
-        /// Subtracts another quantity and returns result in target unit.
-        /// </summary>
+            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+
+            double result = thisUnit.ConvertFromBase(baseResult);
+
+            return new Quantity<U>(RoundToTwoDecimals(result), Unit);
+        }
+
         public Quantity<U> Subtract(Quantity<U> other, U targetUnit)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-            double base1 = ConvertToBase(this.Value, this.Unit);
-            double base2 = ConvertToBase(other.Value, other.Unit);
+            IMeasurable target = (IMeasurable)(object)targetUnit;
 
-            double diffBase = base1 - base2;
-            double result = ConvertFromBase(diffBase, targetUnit);
+            double result = target.ConvertFromBase(baseResult);
 
-            return new Quantity<U>(Math.Round(result, 4), targetUnit);
+            return new Quantity<U>(RoundToTwoDecimals(result), targetUnit);
         }
 
         // ==========================================================
-        // UC12: DIVISION
+        // UC13 – DIVIDE OPERATION
         // ==========================================================
 
         /// <summary>
-        /// Divides two quantities and returns a dimensionless ratio.
+        /// Division returns a scalar value (dimensionless).
         /// </summary>
         public double Divide(Quantity<U> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
-
-            double base1 = ConvertToBase(this.Value, this.Unit);
-            double base2 = ConvertToBase(other.Value, other.Unit);
-
-            if (base2 == 0)
-                throw new ArithmeticException("Division by zero is not allowed.");
-
-            return base1 / base2;
+            return PerformBaseArithmetic(other, ArithmeticOperation.DIVIDE);
         }
 
         // ==========================================================
-        // UC1–UC11: EQUALITY COMPARISON
+        // HELPER – ROUNDING
         // ==========================================================
 
         /// <summary>
-        /// Equality comparison using base unit normalization.
+        /// Ensures consistent rounding across add/subtract operations.
         /// </summary>
-        public override bool Equals(object? obj)
+        private double RoundToTwoDecimals(double value)
         {
-            if (obj is not Quantity<U> other)
-                return false;
-
-            double base1 = ConvertToBase(this.Value, this.Unit);
-            double base2 = ConvertToBase(other.Value, other.Unit);
-
-            return Math.Abs(base1 - base2) < 0.0001;
+            return Math.Round(value, 2);
         }
 
-        public override int GetHashCode()
-        {
-            double baseValue = ConvertToBase(Value, Unit);
-            return baseValue.GetHashCode();
-        }
+        // ==========================================================
+        // ToString Override
+        // ==========================================================
 
         public override string ToString()
-            => $"Quantity({Value}, {Unit})";
-
-        // ==========================================================
-        // HELPER METHODS
-        // ==========================================================
-
-        /// <summary>
-        /// Converts value to base unit depending on enum type.
-        /// </summary>
-        private double ConvertToBase(double value, U unit)
         {
-            if (unit is LengthUnit length)
-                return length.ConvertToBase(value);
-
-            if (unit is WeightUnit weight)
-                return weight.ConvertToBase(value);
-
-            if (unit is VolumeUnit volume)
-                return volume.ConvertToBase(value);
-
-            throw new InvalidOperationException("Unsupported unit type.");
+            return $"{Value} {Unit}";
         }
 
-        /// <summary>
-        /// Converts base value to target unit.
-        /// </summary>
-        private double ConvertFromBase(double baseValue, U unit)
+        public Quantity<U> ConvertTo(U targetUnit)
         {
-            if (unit is LengthUnit length)
-                return length.ConvertFromBase(baseValue);
+            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+            IMeasurable target = (IMeasurable)(object)targetUnit;
 
-            if (unit is WeightUnit weight)
-                return weight.ConvertFromBase(baseValue);
+            double baseValue = thisUnit.ConvertToBase(Value);
+            double result = target.ConvertFromBase(baseValue);
 
-            if (unit is VolumeUnit volume)
-                return volume.ConvertFromBase(baseValue);
-
-            throw new InvalidOperationException("Unsupported unit type.");
+            return new Quantity<U>(RoundToTwoDecimals(result), targetUnit);
         }
     }
 }

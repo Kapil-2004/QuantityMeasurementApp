@@ -55,6 +55,8 @@ namespace QuantityMeasurementApp
             Console.WriteLine("4. Add Lengths (Target Unit)");
             Console.WriteLine("5. Subtract Lengths");
             Console.WriteLine("6. Divide Lengths");
+            Console.WriteLine();
+            Console.Write("Select option: ");
 
             string choice = Console.ReadLine();
 
@@ -81,6 +83,8 @@ namespace QuantityMeasurementApp
             Console.WriteLine("4. Add Weights (Target Unit)");
             Console.WriteLine("5. Subtract Weights");
             Console.WriteLine("6. Divide Weights");
+            Console.WriteLine();
+            Console.Write("Select option: ");
 
             string choice = Console.ReadLine();
 
@@ -107,6 +111,8 @@ namespace QuantityMeasurementApp
             Console.WriteLine("4. Add Volumes (Target Unit)");
             Console.WriteLine("5. Subtract Volumes");
             Console.WriteLine("6. Divide Volumes");
+            Console.WriteLine();
+            Console.Write("Select option: ");
 
             string choice = Console.ReadLine();
 

@@ -12,7 +12,7 @@ namespace QuantityMeasurementApp.Services
         public bool AreEqual(Quantity<U> q1, Quantity<U> q2)
         {
             if (q1 == null || q2 == null)
-                throw new ArgumentNullException("Quantity cannot be null.");
+                throw new ArgumentNullException(nameof(q1), "Quantity cannot be null.");
 
             return q1.Equals(q2);
         }
@@ -20,7 +20,7 @@ namespace QuantityMeasurementApp.Services
         public Quantity<U> Add(Quantity<U> q1, Quantity<U> q2)
         {
             if (q1 == null || q2 == null)
-                throw new ArgumentNullException("Quantity cannot be null.");
+                throw new ArgumentNullException(nameof(q1), "Quantity cannot be null.");
 
             return q1.Add(q2);
         }
@@ -28,7 +28,7 @@ namespace QuantityMeasurementApp.Services
         public Quantity<U> Add(Quantity<U> q1, Quantity<U> q2, U targetUnit)
         {
             if (q1 == null || q2 == null)
-                throw new ArgumentNullException("Quantity cannot be null.");
+                throw new ArgumentNullException(nameof(q1), "Quantity cannot be null.");
 
             return q1.Add(q2, targetUnit);
         }
