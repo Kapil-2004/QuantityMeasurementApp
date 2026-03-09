@@ -1,51 +1,66 @@
-# QuantityMeasurementApp – UC12 Arithmetic Operations (Subtract & Divide)
+# QuantityMeasurementApp – UC13: Centralized Arithmetic Logic
 
 ## 📋 Overview
 
-UC12 extends the system by introducing **additional arithmetic operations** for measurement quantities.
+**UC13** improves the internal implementation of arithmetic operations by refactoring duplicated logic into centralized helper methods.
 
-This use case enables the system to perform:
-- **Subtraction** between quantities
-- **Division** between quantities
+### The Problem (UC12)
 
-These operations are supported for all existing measurement categories:
-- 📏 **Length**
-- ⚖️ **Weight**
-- 🧪 **Volume**
+In UC12, arithmetic operations were implemented separately with repeated logic:
 
-The implementation builds on the architecture established in earlier use cases and maintains full compatibility with the existing service-based design.
+| Task | Status |
+|------|--------|
+| ➕ **Addition** | Repeated logic |
+| ➖ **Subtraction** | Repeated logic |
+| ➗ **Division** | Repeated logic |
 
-All operations internally normalize values using their respective base units, ensuring **consistent and accurate calculations** across different units.
+Each method independently handled:
+- Input validation
+- Unit compatibility checks
+- Base unit conversion  
+- Arithmetic execution
+
+### The Solution (UC13)
+
+UC13 eliminates duplication by introducing **centralized arithmetic and validation helpers** inside the `Quantity` class.
+
+**Key Benefits:**
+- Enforces the **DRY** (Don't Repeat Yourself) principle
+- Easier to maintain, extend, and debug
+- ✅ All public APIs remain identical
+- ✅ No external behavior changes
+- ✅ Full backward compatibility with UC12
 
 ---
 
-## 🎯 Objectives
+## ## 🎯 Objectives
 
-- ✓ Introduce subtraction operations for measurement quantities
-- ✓ Introduce division operations for measurement quantities
-- ✓ Support arithmetic across different units within the same category
-- ✓ Maintain architectural consistency with UC1–UC11
-- ✓ Ensure calculations remain accurate through base unit normalization
-- ✓ Extend the system without modifying existing functionality
+✅ Eliminate duplicated logic across arithmetic methods  
+✅ Introduce a centralized helper for arithmetic execution  
+✅ Introduce centralized validation for arithmetic operands  
+✅ Maintain backward compatibility with UC12 behavior  
+✅ Improve maintainability and readability of the `Quantity` class  
+✅ Prepare the system for future arithmetic operations  
 
 ---
 
 ## 📏 Supported Measurement Categories
 
-UC12 enables arithmetic operations across all supported measurement types.
+UC13 does not introduce new measurement types but improves the internal arithmetic logic used across all existing categories.
 
 | Measurement Type | Base Unit | Supported Units |
-|------------------|-----------|------------------|
+|---|---|---|
 | **Length** | Feet | Feet, Inch, Yard, Centimeter |
 | **Weight** | Kilogram | Kilogram, Gram, Pound |
 | **Volume** | Liter | Liter, Milliliter, Gallon |
+
+All arithmetic operations continue to operate using **base unit normalization**.
+
 ---
 
 ## 🏗️ Architectural Design
 
-UC12 integrates seamlessly into the existing layered architecture used throughout the application.
-
-No structural changes were required. Instead, additional arithmetic methods were introduced within the service layer.
+UC13 performs **internal refactoring only**. The existing project architecture remains unchanged.
 
 ### Project Structure
 
@@ -53,7 +68,7 @@ No structural changes were required. Instead, additional arithmetic methods were
 QuantityMeasurementApp/
 ├── Models/
 │   ├── IMeasurable.cs
-│   ├── Quantity.cs
+│   ├── Quantity.cs              ← Refactored in UC13
 │   ├── LengthUnit.cs
 │   ├── WeightUnit.cs
 │   └── VolumeUnit.cs
@@ -70,114 +85,170 @@ QuantityMeasurementApp/
 ### Component Responsibilities
 
 | Component | Responsibility |
-|-----------|----------------|
-| **Quantity.cs** | Defines the generic quantity model and arithmetic behavior |
-| **Service Classes** | Perform measurement operations using base unit normalization |
-| **Program.cs** | Provides console-based user interaction |
-| **Tests** | Validate correctness of arithmetic operations |
----
-
-## ⚙️ Core Functionalities
-
-### 1️⃣ Subtraction of Quantities
-
-Allows subtraction between two measurement quantities even when they are expressed in different units.
-
-**Examples:**
-- `2 Feet − 12 Inch` → `1 Feet`
-- `5 Kilogram − 500 Gram` → `4.5 Kilogram`
-- `2 Liter − 500 Milliliter` → `1.5 Liter`
-
-The result is returned in the unit of the **first operand**, ensuring consistent behavior across all operations.
-
-### 2️⃣ Division of Quantities
-
-Divides one quantity by another quantity of the same measurement category.
-
-**Examples:**
-- `10 Feet ÷ 2 Feet` → `5`
-- `4 Kilogram ÷ 500 Gram` → `8`
-- `2 Liter ÷ 500 Milliliter` → `4`
-
-Division produces a **dimensionless numeric result**, representing the ratio between the two quantities.
+|---|---|
+| `Quantity.cs` | Handles arithmetic logic and validation |
+| Service Classes | Provide measurement operations to the application |
+| `Program.cs` | Console UI for user interaction |
+| Tests | Validate arithmetic correctness and behavior |
 
 ---
 
-## 🔄 Internal Conversion Strategy
+## ⚙️ Core Refactoring Improvements
 
-All arithmetic operations follow the same **normalization workflow** used in previous use cases:
+UC13 introduces two major internal improvements to enhance code quality.
+
+### 1️⃣ Centralized Arithmetic Helper
+
+A new helper method performs arithmetic operations in base units, ensuring consistent behavior across all operations.
+
+**Method:** `PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)`
+
+**Responsibilities:**
+- Convert both quantities to base units
+- Execute the arithmetic operation
+- Return the computed base-unit result
+
+**Used by:**
+- `Add()`
+- `Subtract()`
+- `Divide()`
+
+### 2️⃣ Centralized Validation Helper
+
+UC13 introduces a dedicated validation method to ensure consistent input validation.
+
+**Method:** `ValidateArithmeticOperands(Quantity<U> other)`
+
+**Validations Performed:**
+- ✅ Null operand validation
+- ✅ Measurement category compatibility  
+- ✅ Numeric finiteness checks
+- ✅ Prevention of invalid arithmetic operations
+
+This ensures that all arithmetic methods fail **consistently** for invalid inputs.
+
+---
+
+## 🔄 Arithmetic Operation Dispatch
+
+UC13 introduces an internal enum used to determine which arithmetic operation should be performed.
+
+### ArithmeticOperation Enum
+
+```csharp
+private enum ArithmeticOperation
+{
+    ADD,
+    SUBTRACT,
+    DIVIDE
+}
+```
+
+This allows the helper method to execute operations in a **type-safe** and **scalable** way without relying on multiple conditional statements.
+
+---
+
+## 🔄 Internal Execution Flow
+
+All arithmetic operations now follow a unified execution flow:
 
 ```
-Input Value → Convert to Base Unit → Perform Calculation → Convert to Result Unit
+Public Arithmetic Method
+         ↓
+ Validate Operands
+         ↓
+Convert Quantities to Base Units
+         ↓
+ Perform Arithmetic Operation
+         ↓
+Convert Result to Target Unit
+         ↓
+   Return Result
 ```
 
-### Example: 2 Liter − 500 Milliliter
+### Example: Subtraction Operation
 
-**Step 1: Convert to Base Unit (Liter)**
-- `2 Liter` → `2 Liter`
-- `500 Milliliter` → `0.5 Liter`
+```
+q1.Subtract(q2)
+         ↓
+ValidateArithmeticOperands(q2)
+         ↓
+PerformBaseArithmetic(q2, SUBTRACT)
+         ↓
+Convert result back to q1 unit
+         ↓
+Return new Quantity
+```
 
-**Step 2: Perform Calculation**
-- `2 − 0.5 = 1.5 Liter`
 ---
 
 ## 🧪 Test Coverage
 
-UC12 expands the existing test suite to validate subtraction and division operations across all measurement categories.
+UC13 ensures that all existing UC12 tests continue to pass without modification.
 
-### Covered Scenarios
+This confirms that the refactoring **does not alter external behavior**.
 
-- ✅ Subtraction between different units
-- ✅ Subtraction returning correct result unit
-- ✅ Division between quantities
-- ✅ Division producing correct ratio
-- ✅ Handling of invalid unit inputs
-- ✅ Validation against edge cases
+### Validation Scenarios Covered
 
-### Example Test Cases
+✅ Null operand validation  
+✅ Cross-category arithmetic prevention  
+✅ Finiteness validation  
+✅ Division by zero detection  
 
-| Test Case | Expected Result |
-|-----------|----------------|
-| `2 Feet − 12 Inch` | `1 Feet` |
-| `5 Kilogram − 500 Gram` | `4.5 Kilogram` |
-| `2 Liter − 500 Milliliter` | `1.5 Liter` |
-| `10 Feet ÷ 2 Feet` | `5` |
-| `4 Kilogram ÷ 500 Gram` | `8` |
+### Arithmetic Scenarios Covered
+
+| Operation | Example | Expected Result |
+|---|---|---|
+| **Addition** | 1 Feet + 12 Inch | 2 Feet |
+| **Subtraction** | 2 Liter − 500 Milliliter | 1.5 Liter |
+| **Division** | 10 Feet ÷ 2 Feet | 5 |
+
 ---
 
 ## 🔒 Design Principles Applied
 
-UC12 continues to follow the same **core software engineering principles** used throughout the project.
+UC13 strengthens the application by reinforcing key software design principles.
 
 | Principle | Description |
-|-----------|-------------|
-| **Consistency** | Arithmetic operations follow the same logic across all measurement types |
-| **Single Responsibility** | Service classes handle only their respective measurement categories |
-| **Extensibility** | Additional operations can be introduced without modifying existing logic |
-| **Reusability** | Base unit conversion logic is reused across all services |
-| **Domain Normalization** | Calculations are performed using base units for accuracy |
+|---|---|
+| **DRY Principle** | Eliminates duplicated validation and conversion logic |
+| **Single Responsibility** | Helper methods isolate arithmetic responsibilities |
+| **Encapsulation** | Arithmetic implementation hidden inside `Quantity` |
+| **Maintainability** | Changes to validation or arithmetic occur in one place |
+| **Scalability** | Future arithmetic operations can reuse the same helper |
+
 ---
 
 ## 🚀 Outcome
 
-UC12 enhances the system by introducing **full arithmetic capability** across measurement quantities.
+UC13 significantly improves the **internal design** of the system without changing its **external behavior**.
 
-The application now supports:
-- 📏 **Length Measurements**
-- ⚖️ **Weight Measurements**
-- 🧪 **Volume Measurements**
-- ➕ **Addition**
-- ➖ **Subtraction**
-- ➗ **Division**
-- 🔄 **Unit Conversion**
-- ✔️ **Equality Comparison**
+### Improvements Achieved
 
-### ✅ System Capability After UC12
+✓ Reduced code duplication  
+✓ Improved readability of arithmetic methods  
+✓ Centralized validation and arithmetic execution  
+✓ Simplified debugging and maintenance  
+✓ Prepared architecture for future operations  
 
-| Measurement Type | Operations Supported |
-|------------------|---------------------|
+---
+
+## 📊 System Capability After UC13
+
+The application now supports the following capabilities across all measurement types.
+
+| Measurement Type | Supported Operations |
+|---|---|
 | **Length** | Compare, Convert, Add, Subtract, Divide |
 | **Weight** | Compare, Convert, Add, Subtract, Divide |
 | **Volume** | Compare, Convert, Add, Subtract, Divide |
 
-This use case demonstrates the **scalability** of the system architecture, allowing new operations to be integrated seamlessly without affecting previously implemented functionality.
+Although UC13 does not add new features, it **strengthens the architecture** by ensuring arithmetic logic is centralized, maintainable, and scalable.
+
+---
+
+## 💡 Summary
+
+UC13 demonstrates an important software engineering practice:
+
+> **Improving internal code quality through refactoring while preserving existing functionality.**
