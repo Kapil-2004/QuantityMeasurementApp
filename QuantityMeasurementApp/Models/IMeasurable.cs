@@ -1,14 +1,46 @@
+using System;
+
 namespace QuantityMeasurementApp.Models
 {
     /// <summary>
     /// Defines common behavior for all measurable units.
-    /// Enforces conversion capability across categories.
+    /// UC14 introduces optional arithmetic support validation.
     /// </summary>
     public interface IMeasurable
     {
-        double GetConversionFactor();              // Factor relative to base unit
-        double ConvertToBase(double value);        // Convert to base unit
-        double ConvertFromBase(double baseValue);  // Convert from base unit
-        string GetUnitName();                      // Readable name
+        // ==========================================================
+        // CORE CONVERSION METHODS
+        // ==========================================================
+
+        double GetConversionFactor();
+
+        double ConvertToBase(double value);
+
+        double ConvertFromBase(double baseValue);
+
+        string GetUnitName();
+
+        // ==========================================================
+        // UC14 – OPTIONAL ARITHMETIC SUPPORT
+        // ==========================================================
+
+        /// <summary>
+        /// Indicates whether arithmetic operations are supported.
+        /// Default implementation allows arithmetic.
+        /// Temperature will override this behavior.
+        /// </summary>
+        bool SupportsArithmetic()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Validates whether a specific operation is supported.
+        /// Default implementation allows all operations.
+        /// </summary>
+        void ValidateOperationSupport(string operation)
+        {
+            // Default: no restriction
+        }
     }
 }

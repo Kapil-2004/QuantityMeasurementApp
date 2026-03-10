@@ -6,11 +6,12 @@ namespace QuantityMeasurementApp
 {
     internal class Program
     {
-        static void Main(string[] args)
-        {
-            QuantityLengthService lengthService = new QuantityLengthService();
-            QuantityWeightService weightService = new QuantityWeightService();
-            QuantityVolumeService volumeService = new QuantityVolumeService();
+    static void Main(string[] args)
+    {
+    QuantityLengthService lengthService = new QuantityLengthService();
+    QuantityWeightService weightService = new QuantityWeightService();
+    QuantityVolumeService volumeService = new QuantityVolumeService();
+    QuantityTemperatureService temperatureService = new QuantityTemperatureService(); // UC14
 
             while (true)
             {
@@ -21,10 +22,11 @@ namespace QuantityMeasurementApp
                 Console.WriteLine("1. Length Operations");
                 Console.WriteLine("2. Weight Operations");
                 Console.WriteLine("3. Volume Operations");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. Temperature Operations");
+                Console.WriteLine("5. Exit");
                 Console.Write("Select option: ");
 
-                string choice = Console.ReadLine();
+                string choice = Console.ReadLine() ?? "";
 
                 switch (choice)
                 {
@@ -38,6 +40,9 @@ namespace QuantityMeasurementApp
                         ShowVolumeMenu(volumeService);
                         break;
                     case "4":
+                        ShowTemperatureMenu(temperatureService);
+                        break;
+                    case "5":
                         return;
                 }
             }
@@ -58,7 +63,7 @@ namespace QuantityMeasurementApp
             Console.WriteLine();
             Console.Write("Select option: ");
 
-            string choice = Console.ReadLine();
+            string choice = Console.ReadLine() ?? "";
 
             switch (choice)
             {
@@ -86,7 +91,7 @@ namespace QuantityMeasurementApp
             Console.WriteLine();
             Console.Write("Select option: ");
 
-            string choice = Console.ReadLine();
+            string choice = Console.ReadLine() ?? "";
 
             switch (choice)
             {
@@ -114,7 +119,7 @@ namespace QuantityMeasurementApp
             Console.WriteLine();
             Console.Write("Select option: ");
 
-            string choice = Console.ReadLine();
+            string choice = Console.ReadLine() ?? "";
 
             switch (choice)
             {
@@ -124,6 +129,26 @@ namespace QuantityMeasurementApp
                 case "4": AddVolumesWithTarget(service); break;
                 case "5": SubtractVolumes(); break;
                 case "6": DivideVolumes(); break;
+            }
+        }
+
+        // ================= TEMPERATURE MENU =================
+
+        private static void ShowTemperatureMenu(QuantityTemperatureService service)
+        {
+            Console.Clear();
+            Console.WriteLine("==== Temperature Operations ====");
+            Console.WriteLine("1. Compare Temperatures");
+            Console.WriteLine("2. Convert Temperature");
+            Console.WriteLine();
+            Console.Write("Select option: ");
+
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1": CompareTemperatures(service); break;
+                case "2": ConvertTemperature(service); break;
             }
         }
 
@@ -184,8 +209,6 @@ namespace QuantityMeasurementApp
             Console.WriteLine(result);
             Pause();
         }
-
-        // UC12
 
         private static void SubtractLengths()
         {
@@ -267,8 +290,6 @@ namespace QuantityMeasurementApp
             Pause();
         }
 
-        // UC12
-
         private static void SubtractWeights()
         {
             double v1 = ReadDouble("Enter first value: ");
@@ -349,8 +370,6 @@ namespace QuantityMeasurementApp
             Pause();
         }
 
-        // UC12
-
         private static void SubtractVolumes()
         {
             double v1 = ReadDouble("Enter first value: ");
@@ -381,6 +400,30 @@ namespace QuantityMeasurementApp
             Pause();
         }
 
+        // ================= TEMPERATURE OPERATIONS =================
+
+        private static void CompareTemperatures(QuantityTemperatureService service)
+        {
+            double v1 = ReadDouble("Enter first value: ");
+            TemperatureUnit u1 = ReadTemperatureUnit();
+
+            double v2 = ReadDouble("Enter second value: ");
+            TemperatureUnit u2 = ReadTemperatureUnit();
+
+            Console.WriteLine(service.AreEqual(v1, u1, v2, u2));
+            Pause();
+        }
+
+        private static void ConvertTemperature(QuantityTemperatureService service)
+        {
+            double v = ReadDouble("Enter value: ");
+            TemperatureUnit s = ReadTemperatureUnit();
+            TemperatureUnit t = ReadTemperatureUnit();
+
+            Console.WriteLine(service.Convert(v, s, t));
+            Pause();
+        }
+
         // ================= INPUT HELPERS =================
 
         private static LengthUnit ReadLengthUnit()
@@ -390,7 +433,7 @@ namespace QuantityMeasurementApp
             Console.WriteLine("2. Inch");
             Console.WriteLine("3. Centimeter");
             Console.WriteLine("4. Yard");
-            return (LengthUnit)(int.Parse(Console.ReadLine()) - 1);
+            return (LengthUnit)(int.Parse(Console.ReadLine() ?? "") - 1);
         }
 
         private static WeightUnit ReadWeightUnit()
@@ -399,7 +442,7 @@ namespace QuantityMeasurementApp
             Console.WriteLine("1. Kilogram");
             Console.WriteLine("2. Gram");
             Console.WriteLine("3. Pound");
-            return (WeightUnit)(int.Parse(Console.ReadLine()) - 1);
+            return (WeightUnit)(int.Parse(Console.ReadLine() ?? "") - 1);
         }
 
         private static VolumeUnit ReadVolumeUnit()
@@ -408,13 +451,22 @@ namespace QuantityMeasurementApp
             Console.WriteLine("1. Litre");
             Console.WriteLine("2. Millilitre");
             Console.WriteLine("3. Gallon");
-            return (VolumeUnit)(int.Parse(Console.ReadLine()) - 1);
+            return (VolumeUnit)(int.Parse(Console.ReadLine() ?? "") - 1);
+        }
+
+        private static TemperatureUnit ReadTemperatureUnit()
+        {
+            Console.WriteLine("Select Temperature Unit:");
+            Console.WriteLine("1. Celsius");
+            Console.WriteLine("2. Fahrenheit");
+            Console.WriteLine("3. Kelvin");
+            return (TemperatureUnit)(int.Parse(Console.ReadLine() ?? "") - 1);
         }
 
         private static double ReadDouble(string message)
         {
             Console.Write(message);
-            return double.Parse(Console.ReadLine());
+            return double.Parse(Console.ReadLine() ?? "");
         }
 
         private static void Pause()
@@ -423,4 +475,5 @@ namespace QuantityMeasurementApp
             Console.ReadKey();
         }
     }
+
 }

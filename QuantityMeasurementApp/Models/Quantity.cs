@@ -54,7 +54,7 @@ namespace QuantityMeasurementApp.Models
         }
 
         // ==========================================================
-        // UC13 – CORE ARITHMETIC HELPER
+        // UC14 – CORE ARITHMETIC HELPER
         // ==========================================================
 
         /// <summary>
@@ -65,8 +65,14 @@ namespace QuantityMeasurementApp.Models
         {
             ValidateArithmeticOperands(other);
 
-            IMeasurable thisUnit = (IMeasurable)(object)Unit;
-            IMeasurable otherUnit = (IMeasurable)(object)other.Unit;
+            IMeasurable thisUnit = new MeasurableUnitAdapter(Unit);
+
+            // ==========================================================
+            // UC14 – Validate operation support BEFORE arithmetic
+            // ==========================================================
+            thisUnit.ValidateOperationSupport(operation.ToString());
+
+            IMeasurable otherUnit = new MeasurableUnitAdapter(other.Unit);
 
             // Convert both values to base unit
             double baseValue1 = thisUnit.ConvertToBase(Value);
@@ -103,7 +109,7 @@ namespace QuantityMeasurementApp.Models
         {
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
 
-            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+            IMeasurable thisUnit = new MeasurableUnitAdapter(Unit);
 
             double result = thisUnit.ConvertFromBase(baseResult);
 
@@ -117,7 +123,7 @@ namespace QuantityMeasurementApp.Models
         {
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
 
-            IMeasurable target = (IMeasurable)(object)targetUnit;
+            IMeasurable target = new MeasurableUnitAdapter(targetUnit);
 
             double result = target.ConvertFromBase(baseResult);
 
@@ -132,7 +138,7 @@ namespace QuantityMeasurementApp.Models
         {
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-            IMeasurable thisUnit = (IMeasurable)(object)Unit;
+            IMeasurable thisUnit = new MeasurableUnitAdapter(Unit);
 
             double result = thisUnit.ConvertFromBase(baseResult);
 
@@ -143,7 +149,7 @@ namespace QuantityMeasurementApp.Models
         {
             double baseResult = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-            IMeasurable target = (IMeasurable)(object)targetUnit;
+            IMeasurable target = new MeasurableUnitAdapter(targetUnit);
 
             double result = target.ConvertFromBase(baseResult);
 
@@ -171,7 +177,35 @@ namespace QuantityMeasurementApp.Models
         /// </summary>
         private double RoundToTwoDecimals(double value)
         {
-            return Math.Round(value, 2);
+            return Math.Round(value, 4);
+        }
+
+        // ==========================================================
+        // EQUALITY COMPARISON
+        // ==========================================================
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not Quantity<U> other)
+                return false;
+
+            // Convert both to base unit and compare
+            IMeasurable thisAdapter = new MeasurableUnitAdapter(Unit);
+            IMeasurable otherAdapter = new MeasurableUnitAdapter(other.Unit);
+
+            double thisBaseValue = thisAdapter.ConvertToBase(Value);
+            double otherBaseValue = otherAdapter.ConvertToBase(other.Value);
+
+            return Math.Abs(thisBaseValue - otherBaseValue) < 0.0001;
+        }
+
+        public override int GetHashCode()
+        {
+            const int prime = 31;
+            int result = 1;
+            result = prime * result + Value.GetHashCode();
+            result = prime * result + (Unit?.GetHashCode() ?? 0);
+            return result;
         }
 
         // ==========================================================
@@ -185,8 +219,8 @@ namespace QuantityMeasurementApp.Models
 
         public Quantity<U> ConvertTo(U targetUnit)
         {
-            IMeasurable thisUnit = (IMeasurable)(object)Unit;
-            IMeasurable target = (IMeasurable)(object)targetUnit;
+            IMeasurable thisUnit = new MeasurableUnitAdapter(Unit);
+            IMeasurable target = new MeasurableUnitAdapter(targetUnit);
 
             double baseValue = thisUnit.ConvertToBase(Value);
             double result = target.ConvertFromBase(baseValue);

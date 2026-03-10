@@ -35,6 +35,9 @@ namespace QuantityMeasurementApp.Services
 
         public double ConvertTo(double value, U from, U to)
         {
+            if (!double.IsFinite(value))
+                throw new ArgumentException($"Value must be a finite number. Received: {value}");
+
             var quantity = new Quantity<U>(value, from);
             var converted = quantity.ConvertTo(to);
             return converted.Value;
