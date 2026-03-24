@@ -3,8 +3,6 @@ using QuantityMeasurementBusinessLayer.Exceptions;
 using QuantityMeasurementModelLayer.DTO;
 using QuantityMeasurementModelLayer.Enums;
 using QuantityMeasurementModelLayer.Entities;
-using QuantityMeasurementRepositoryLayer.Interfaces;
-using QuantityMeasurementModelLayer.Entities;
 using QuantityMeasurementModelLayer.Models;
 using QuantityMeasurementRepositoryLayer.Interfaces;
 

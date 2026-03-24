@@ -1,3 +1,648 @@
+# QuantityMeasurementApp – UC17: Transformation to ASP.NET Core Web API with EF Core
+
+## 🎯 UC17 Overview
+
+**UC17** transforms the UC16 Console Application into a professional **ASP.NET Core Web API** with **Entity Framework Core (ORM)**, replacing manual ADO.NET SQL operations with a modern, production-grade REST API architecture.
+
+### 🔄 From Console to Web API
+
+| Aspect | UC16 (Console App) | UC17 (Web API) |
+|---|---|---|
+| **Entry Point** | Console Menu | HTTP Server |
+| **User Interaction** | Text-based console input | REST API requests (JSON) |
+| **Architecture** | Console → Controller → Service → ADO.NET → SQL | HTTP → Controller → Service → EF Core → SQL |
+| **Database Access** | Manual SQL + ADO.NET | EF Core ORM |
+| **Data Format** | In-memory objects | JSON request/response |
+| **Documentation** | Code comments | Swagger/OpenAPI |
+| **Scalability** | Single-user console | Multi-user, concurrent API |
+
+### 🧪 Test Examples
+
+**UC16 (Console)**
+```
+Menu opens → User types "Add 1 feet + 12 inches" → Result printed to console
+```
+
+**UC17 (Web API)**
+```
+POST http://localhost:5000/api/quantities/add
+Content-Type: application/json
+
+{
+  "q1": { "value": 1, "unit": "feet", "measurementType": "Length" },
+  "q2": { "value": 12, "unit": "inches", "measurementType": "Length" }
+}
+
+Response:
+{
+  "success": true,
+  "message": "Addition successful",
+  "data": {
+    "result": 2.0,
+    "unit": "feet",
+    "measurementType": "Length"
+  },
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+---
+
+## 📋 UC17 Features
+
+### ✅ RESTful API Endpoints
+- **POST /api/quantities/compare** – Compare two quantities
+- **POST /api/quantities/convert** – Convert quantity to different unit
+- **POST /api/quantities/add** – Add two quantities
+- **POST /api/quantities/subtract** – Subtract two quantities
+- **POST /api/quantities/divide** – Divide two quantities
+- **GET /api/quantities/history** – Retrieve operation history
+- **GET /api/quantities/count** – Get total operation count
+- **GET /api/quantities/health** – Health check endpoint
+
+### ✅ Entity Framework Core (EF Core)
+- **Automatic ORM mapping** – No manual SQL queries
+- **DbContext abstraction** – Single point of database configuration
+- **Migrations system** – Version control for database schema
+- **LINQ queries** – Type-safe, compile-time checked queries
+- **Lazy loading & eager loading** – Optimized data fetching
+- **Transaction support** – Built-in ACID guarantees
+
+### ✅ Data Validation
+- **Fluent validation** – Data annotations on request models
+- **Model binding** – Automatic request deserialization
+- **Error responses** – Standardized error messages
+- **HTTP status codes** – Proper REST semantics (400, 404, 500)
+
+### ✅ Global Exception Handling
+- **Middleware-based** – Catches all unhandled exceptions
+- **Custom error responses** – Consistent error format
+- **Logging** – All exceptions logged for debugging
+- **Domain exceptions** – Special handling for business logic errors
+
+### ✅ API Documentation
+- **Swagger UI** – Interactive API exploration at `/swagger`
+- **OpenAPI spec** – Machine-readable API definition
+- **XML comments** – Method descriptions in responses
+- **Response examples** – Sample data for each endpoint
+
+---
+
+## 📁 UC17 Project Structure
+
+```
+QuantityMeasurementApp/
+│
+├── QuantityMeasurementAPI/                      # NEW: Web API Layer (UC17)
+│   ├── Controllers/
+│   │   └── QuantitiesController.cs              # REST API endpoints
+│   ├── Data/
+│   │   ├── ApplicationDbContext.cs              # EF Core DbContext
+│   │   └── Migrations/
+│   │       ├── 20260320000000_InitialCreate.cs  # Auto-generated migration
+│   │       ├── ApplicationDbContextModelSnapshot.cs
+│   │       └── (future migrations here)
+│   ├── Middleware/
+│   │   └── GlobalExceptionHandlingMiddleware.cs # Global error handler
+│   ├── Models/
+│   │   ├── Request/
+│   │   │   └── RequestModels.cs                 # API request DTOs
+│   │   └── Response/
+│   │       └── ResponseModels.cs                # API response DTOs
+│   ├── Program.cs                               # DI & middleware setup
+│   ├── appsettings.json                         # Configuration
+│   ├── launchSettings.json                      # Profile settings
+│   ├── QuantityMeasurementAPI.csproj            # Project file
+│   └── obj, bin/                                # Build output
+│
+├── QuantityMeasurementBusinessLayer/            # UNCHANGED: Core logic
+│   ├── Controllers/                             # (No longer used by API)
+│   ├── Services/
+│   │   ├── IQuantityMeasurementService.cs
+│   │   └── QuantityMeasurementServiceImpl.cs
+│   ├── Engines/
+│   │   ├── ArithmeticEngine.cs
+│   │   ├── ConversionEngine.cs
+│   │   └── ValidationEngine.cs
+│   └── Exceptions/
+│       └── QuantityMeasurementException.cs
+│
+├── QuantityMeasurementRepositoryLayer/          # UPGRADED: EF Core support
+│   ├── Interfaces/
+│   │   └── IQuantityMeasurementRepository.cs
+│   └── Implementations/
+│       ├── QuantityMeasurementDatabaseRepository.cs  # (UC16 ADO.NET)
+│       ├── QuantityMeasurementCacheRepository.cs     # (UC15)
+│       └── EFCoreQuantityMeasurementRepository.cs    # NEW: EF Core implementation
+│
+├── QuantityMeasurementModelLayer/               # UPGRADED: EF Core entities
+│   ├── DTO/
+│   │   └── QuantityDTO.cs
+│   ├── Entities/
+│   │   └── QuantityMeasurementEntity.cs         # (Added Id, CreatedAt properties)
+│   ├── Models/
+│   │   └── QuantityModel.cs
+│   └── Enums/
+│       ├── LengthUnit.cs
+│       ├── WeightUnit.cs
+│       ├── VolumeUnit.cs
+│       ├── TemperatureUnit.cs
+│       └── OperationType.cs
+│
+├── QuantityMeasurementConsole/                  # OPTIONAL: Legacy console app
+│   ├── Menu.cs
+│   ├── Program.cs
+│   └── (Can coexist with API)
+│
+├── QuantityMeasurementApp.Tests/                # UPGRADED: API tests
+│   ├── Engines/
+│   ├── Services/
+│   ├── Repository/
+│   └── Integration/
+│
+├── QuantityMeasurementApp.slnx                  # UPDATED: Includes API project
+└── README.md                                    # THIS FILE
+```
+
+---
+
+## 🔧 Technology Stack (UC17)
+
+| Component | Technology | Purpose |
+|---|---|---|
+| **Web Framework** | ASP.NET Core 8.0 | RESTful API server |
+| **ORM** | Entity Framework Core 8.0 | Object-relational mapping |
+| **Database** | SQL Server | Persistent data store |
+| **API Docs** | Swashbuckle (Swagger) | Interactive API documentation |
+| **Logging** | Built-in ILogger | Operation logging |
+| **Validation** | Data Annotations | Request validation |
+| **Serialization** | System.Text.Json | JSON request/response handling |
+
+---
+
+## 🌐 API Endpoints Reference
+
+### Operation Endpoints
+
+#### 1. Compare Quantities
+```http
+POST /api/quantities/compare
+Content-Type: application/json
+
+{
+  "q1": {
+    "value": 10,
+    "unit": "feet",
+    "measurementType": "Length"
+  },
+  "q2": {
+    "value": 120,
+    "unit": "inches",
+    "measurementType": "Length"
+  }
+}
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Comparison successful",
+  "data": {
+    "areEqual": true,
+    "message": "Quantities are equal"
+  },
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+#### 2. Convert Unit
+```http
+POST /api/quantities/convert
+Content-Type: application/json
+
+{
+  "quantity": {
+    "value": 1,
+    "unit": "feet",
+    "measurementType": "Length"
+  },
+  "targetUnit": "inches"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Conversion successful",
+  "data": {
+    "result": 12.0,
+    "unit": "inches",
+    "measurementType": "Length"
+  },
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+#### 3. Add Quantities
+```http
+POST /api/quantities/add
+Content-Type: application/json
+
+{
+  "q1": {
+    "value": 1,
+    "unit": "feet",
+    "measurementType": "Length"
+  },
+  "q2": {
+    "value": 12,
+    "unit": "inches",
+    "measurementType": "Length"
+  }
+}
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Addition successful",
+  "data": {
+    "result": 2.0,
+    "unit": "feet",
+    "measurementType": "Length"
+  },
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+#### 4. Get Operation History
+```http
+GET /api/quantities/history
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "History retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "operation": "Add",
+      "operand1": {"value": 1, "unit": "feet"},
+      "operand2": {"value": 12, "unit": "inches"},
+      "result": 2.0,
+      "hasError": false,
+      "errorMessage": null,
+      "createdAt": "2026-03-20T12:34:56.789Z"
+    },
+    ...
+  ],
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+#### 5. Get Operation Count
+```http
+GET /api/quantities/count
+```
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Count retrieved successfully",
+  "data": {
+    "totalOperations": 42
+  },
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+#### 6. Health Check
+```http
+GET /api/quantities/health
+```
+**Response (200 OK):**
+```json
+{
+  "status": "API is running",
+  "timestamp": "2026-03-20T12:34:56.789Z"
+}
+```
+
+---
+
+## 🛠️ EF Core Configuration
+
+### ApplicationDbContext
+```csharp
+public class ApplicationDbContext : DbContext
+{
+    public DbSet<QuantityMeasurementEntity> QuantityMeasurements { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Configure QuantityMeasurementEntity
+        modelBuilder.Entity<QuantityMeasurementEntity>()
+            .HasKey(e => e.Id);
+
+        // JSON converters for complex types
+        modelBuilder.Entity<QuantityMeasurementEntity>()
+            .Property(e => e.Operand1)
+            .HasConversion(...); // Serialize to JSON
+
+        // Indexes for performance
+        modelBuilder.Entity<QuantityMeasurementEntity>()
+            .HasIndex(e => e.CreatedAt);
+
+        modelBuilder.Entity<QuantityMeasurementEntity>()
+            .HasIndex(e => e.Operation);
+    }
+}
+```
+
+### DbContext Injection
+```csharp
+// In Program.cs
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+```
+
+### Connection String
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.\\SQLEXPRESS;Database=QuantityMeasurementDB;Trusted_Connection=true;Encrypt=false;"
+  }
+}
+```
+
+---
+
+## 📊 EF Core vs ADO.NET Comparison
+
+| Aspect | UC16 (ADO.NET) | UC17 (EF Core) |
+|---|---|---|
+| **Query Syntax** | Raw SQL strings | LINQ (Language Integrated Query) |
+| **Type Safety** | Compile time: ❌ | Compile time: ✅ |
+| **SQL Injection** | Manual parameterization | Automatic parameterization |
+| **Boilerplate Code** | High | Low |
+| **Migrations** | Manual SQL scripts | Automatic code-first migrations |
+| **Performance** | Fast (direct SQL) | Very fast (optimized LINQ) |
+| **Learning Curve** | Moderate | Moderate |
+| **Testability** | Moderate | High (DbContext mocking) |
+| **Example** | `new SqlCommand("SELECT * FROM QuantityMeasurements WHERE OperationType = @type")` | `_context.QuantityMeasurements.Where(e => e.Operation == operationType)` |
+
+---
+
+## 🚀 Running the UC17 API
+
+### 1. Build the Solution
+```bash
+cd d:\Main_Project\Github
+dotnet build
+```
+
+### 2. Apply Database Migrations
+```bash
+cd QuantityMeasurementAPI
+dotnet ef database update
+```
+
+### 3. Run the API Server
+```bash
+dotnet run
+```
+
+The API will start at: **http://localhost:5000**
+
+### 4. Access Swagger UI
+Navigate to: **http://localhost:5000/swagger**
+
+You'll see an interactive interface to test all API endpoints!
+
+---
+
+## 📝 Request/Response Models
+
+### QuantityRequest (Request DTO)
+```csharp
+public class QuantityRequest
+{
+    [Required]
+    [Range(0, double.MaxValue)]
+    public double Value { get; set; }
+
+    [Required]
+    public string Unit { get; set; }
+
+    [Required]
+    public string MeasurementType { get; set; }
+}
+```
+
+### BinaryOperationRequest (Request DTO)
+```csharp
+public class BinaryOperationRequest
+{
+    [Required]
+    public QuantityRequest Q1 { get; set; }
+
+    [Required]
+    public QuantityRequest Q2 { get; set; }
+}
+```
+
+### ApiResponse<T> (Generic Response Wrapper)
+```csharp
+public class ApiResponse<T>
+{
+    public bool Success { get; set; }
+    public string Message { get; set; }
+    public T Data { get; set; }
+    public DateTime Timestamp { get; set; }
+}
+```
+
+---
+
+## 🧪 Testing UC17 API
+
+### Using cURL
+```bash
+curl -X POST http://localhost:5000/api/quantities/add \
+  -H "Content-Type: application/json" \
+  -d '{
+    "q1": {"value": 1, "unit": "feet", "measurementType": "Length"},
+    "q2": {"value": 12, "unit": "inches", "measurementType": "Length"}
+  }'
+```
+
+### Using Postman
+1. Create POST request to `http://localhost:5000/api/quantities/add`
+2. Set header: `Content-Type: application/json`
+3. Body (raw JSON):
+```json
+{
+  "q1": {"value": 1, "unit": "feet", "measurementType": "Length"},
+  "q2": {"value": 12, "unit": "inches", "measurementType": "Length"}
+}
+```
+4. Send and view response
+
+### Using Swagger UI
+1. Navigate to `http://localhost:5000/swagger`
+2. Click on the endpoint (e.g., "POST /api/quantities/add")
+3. Click "Try it out"
+4. Fill in the request body
+5. Click "Execute"
+
+---
+
+## 🔄 Dependency Injection Setup (Program.cs)
+
+```csharp
+// EF Core DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Service Layer
+builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServiceImpl>();
+
+// Repository Layer (EF Core implementation)
+builder.Services.AddScoped<IQuantityMeasurementRepository, EFCoreQuantityMeasurementRepository>();
+
+// Add Swagger
+builder.Services.AddSwaggerGen();
+
+// Add CORS (for frontend integration)
+builder.Services.AddCors(options => {...});
+```
+
+---
+
+## ⚠️ Global Exception Handler Middleware
+
+Catches all unhandled exceptions and returns standardized error responses:
+
+```csharp
+public class GlobalExceptionHandlingMiddleware
+{
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (QuantityMeasurementException qEx)
+        {
+            // Return 400 Bad Request for domain errors
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync(JsonSerializer.Serialize(new ErrorResponse { ... }));
+        }
+        catch (Exception ex)
+        {
+            // Return 500 Internal Server Error for unexpected errors
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync(JsonSerializer.Serialize(new ErrorResponse { ... }));
+        }
+    }
+}
+```
+
+---
+
+## 🔍 Database Schema (EF Core)
+
+After migrations, the `QuantityMeasurements` table will have:
+
+```
+Columns:
+- Id (int) – Primary Key, auto-increment
+- Operand1 (nvarchar(max)) – JSON serialized first operand
+- Operand2 (nvarchar(max)) – JSON serialized second operand
+- Operation (nvarchar) – Enum: Compare, Convert, Add, Subtract, Divide
+- Result (nvarchar(max)) – JSON serialized result
+- HasError (bit) – Success/failure flag
+- ErrorMessage (nvarchar(500)) – Error details if failed
+- CreatedAt (datetime2) – Timestamp of operation
+
+Indexes:
+- PK_QuantityMeasurements (Id)
+- IX_QuantityMeasurements_CreatedAt (for sorting)
+- IX_QuantityMeasurements_Operation (for filtering)
+```
+
+---
+
+## 📚 Design Patterns in UC17
+
+### 1. **Repository Pattern** (Abstraction)
+- IQuantityMeasurementRepository defines contract
+- EFCoreQuantityMeasurementRepository implements EF Core logic
+- Service layer remains agnostic to persistence mechanism
+
+### 2. **Dependency Injection (DI)**
+- Tight coupling eliminated
+- Services injected via constructor
+- Easy to mock for unit testing
+
+### 3. **Data Transfer Objects (DTOs)**
+- Separate request/response models from entities
+- Validates incoming data
+- Decouples API contracts from persistence models
+
+### 4. **Service Layer Pattern**
+- Business logic encapsulated in IQuantityMeasurementService
+- Reusable across Console and Web API
+- Easy to test in isolation
+
+### 5. **Middleware Architecture**
+- GlobalExceptionHandlingMiddleware for cross-cutting concerns
+- Centralized error handling
+- Consistent error responses
+
+### 6. **Configuration as Code**
+- appsettings.json for configuration management
+- Environment-specific settings (Development, Production)
+- Easy to deploy to different environments
+
+---
+
+## 🎓 Key Takeaways (UC17)
+
+✅ **From Console to HTTP** – User interaction moved from text input to REST API  
+✅ **From ADO.NET to EF Core** – Manual SQL replaced with ORM  
+✅ **From Single-tier to N-tier** – Proper separation of concerns  
+✅ **From Monolith to Microservices-ready** – API-first architecture  
+✅ **From Documentation to Swagger** – Auto-generated interactive API docs  
+✅ **From Manual Testing to API Testing** – Testable HTTP contracts  
+✅ **From Local Execution to Production-ready** – Scalable backend system  
+
+---
+
+## 📋 What Remains Unchanged
+
+All UC1-UC16 business logic is fully preserved:
+- ✔ Conversion engines
+- ✔ Validation logic
+- ✔ Arithmetic operations
+- ✔ Service layer implementation
+- ✔ Database persistence (now via EF Core)
+
+The API is simply a **new presentation layer** that wraps the existing business logic.
+
+---
+
+## 🚀 Next Steps After UC17
+
+1. **Unit Tests** – Add API controller tests
+2. **Integration Tests** – Test API endpoints with real database
+3. **Frontend** – Build React/Angular UI consuming these APIs
+4. **Authentication** – Add JWT/OAuth for security
+5. **Database Optimization** – Add more indexes for performance
+6. **Containerization** – Docker for deployment
+7. **Microservices** – Split into separate services by domain
+
 # QuantityMeasurementApp – UC16: Database Integration & Persistence
 
 ## 📋 Overview
