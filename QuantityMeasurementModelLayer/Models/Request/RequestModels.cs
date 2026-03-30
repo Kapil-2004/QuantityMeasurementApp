@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace QuantityMeasurementAPI.Models.Request
+namespace QuantityMeasurementModelLayer.Models.Request
 {
     /// <summary>
     /// Request DTO for quantity-based operations

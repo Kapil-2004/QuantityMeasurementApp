@@ -1,4 +1,4 @@
-namespace QuantityMeasurementAPI.Models.Response
+namespace QuantityMeasurementModelLayer.Models.Response
 {
     /// <summary>
     /// Response DTO for comparison operations

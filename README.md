@@ -1,5 +1,20 @@
-# QuantityMeasurementApp – UC17: Transformation to ASP.NET Core Web API with EF Core
+# QuantityMeasurementApp - UC18: Security, JWT & OAuth Concepts
 
+## 🛡️ UC18 Overview
+
+**UC18** enhances the ASP.NET Core Web API with robust security features. It introduces user authentication and authorization utilizing JSON Web Tokens (JWT), along with password hashing and AES symmetric encryption utilities.
+
+### 🔐 Key Security Features Implemented
+
+1. **JWT Authentication**: Implemented standard Bearer Token Auth via JWT.
+2. **Authorization Profiles**: Applied `[Authorize]` globally to secure REST API endpoints like measurement conversion and history retrieval.
+3. **Password Hashing**: Implemented PBKDF2 (HMACSHA256) for secure credential storage in the database.
+4. **Data Encryption Utility**: Created an AES (Advanced Encryption Standard) encryption and decryption helper for confidential data handling.
+5. **Auth Controller**: Added new POST endpoints for user `/api/auth/register` and `/api/auth/login`.
+
+---
+
+# QuantityMeasurementApp – UC17: Transformation to ASP.NET Core Web API with EF Core
 ## 🎯 UC17 Overview
 
 **UC17** transforms the UC16 Console Application into a professional **ASP.NET Core Web API** with **Entity Framework Core (ORM)**, replacing manual ADO.NET SQL operations with a modern, production-grade REST API architecture.

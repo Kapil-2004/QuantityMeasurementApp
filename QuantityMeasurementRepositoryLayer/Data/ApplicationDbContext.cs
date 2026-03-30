@@ -5,7 +5,7 @@ using QuantityMeasurementModelLayer.Entities;
 using QuantityMeasurementModelLayer.Models;
 using System.Text.Json;
 
-namespace QuantityMeasurementAPI.Data
+namespace QuantityMeasurementRepositoryLayer.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -14,6 +14,7 @@ namespace QuantityMeasurementAPI.Data
         {
         }
 
+        public DbSet<UserEntity> Users { get; set; }
         public DbSet<QuantityMeasurementEntity> QuantityMeasurements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,7 +63,8 @@ namespace QuantityMeasurementAPI.Data
                 .HasColumnType("nvarchar(max)");
 
             entityBuilder.Property(e => e.Operation)
-                .HasConversion(new EnumToStringConverter<QuantityMeasurementModelLayer.Enums.OperationType>());
+                .HasConversion(new EnumToStringConverter<QuantityMeasurementModelLayer.Enums.OperationType>())
+                .HasMaxLength(50);
 
             entityBuilder.Property(e => e.ErrorMessage)
                 .IsRequired(false)

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using QuantityMeasurementAPI.Models.Response;
+using QuantityMeasurementModelLayer.Models.Response;
 using QuantityMeasurementBusinessLayer.Exceptions;
 
 namespace QuantityMeasurementAPI.Middleware

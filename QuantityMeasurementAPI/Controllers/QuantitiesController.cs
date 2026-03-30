@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using QuantityMeasurementAPI.Models.Request;
-using QuantityMeasurementAPI.Models.Response;
+using QuantityMeasurementModelLayer.Models.Request;
+using QuantityMeasurementModelLayer.Models.Response;
 using QuantityMeasurementBusinessLayer.Services;
 using QuantityMeasurementModelLayer.DTO;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuantityMeasurementAPI.Controllers
 {
@@ -11,6 +12,7 @@ namespace QuantityMeasurementAPI.Controllers
     /// Quantity Measurement API Controller
     /// Handles all measurement operations via REST API endpoints
     /// </summary>
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]

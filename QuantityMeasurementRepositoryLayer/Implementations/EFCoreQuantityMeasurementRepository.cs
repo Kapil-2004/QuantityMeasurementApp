@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using QuantityMeasurementAPI.Data;
+using QuantityMeasurementRepositoryLayer.Data;
 using QuantityMeasurementModelLayer.Entities;
 using QuantityMeasurementModelLayer.Enums;
 using QuantityMeasurementRepositoryLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace QuantityMeasurementAPI.Repositories
+namespace QuantityMeasurementRepositoryLayer.Implementations
 {
     /// <summary>
     /// EF Core implementation of QuantityMeasurement Repository
