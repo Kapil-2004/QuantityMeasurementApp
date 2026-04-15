@@ -64,9 +64,26 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// EF Core DbContext Configuration
+// Database Connection String Logic
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+string? connectionString;
+
+if (string.IsNullOrEmpty(databaseUrl))
+{
+    // Use appsettings.json connection string if DATABASE_URL is not set
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+else
+{
+    // Parse DATABASE_URL (postgresql://user:pass@host:port/database)
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true;";
+}
+
+// EF Core DbContext Configuration (PostgreSQL)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    options.UseNpgsql(connectionString,
         b => b.MigrationsAssembly("QuantityMeasurementRepositoryLayer")));
 
 // Dependency Injection - Service Layer
@@ -77,22 +94,36 @@ builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 builder.Services.AddScoped<IQuantityMeasurementRepository, EFCoreQuantityMeasurementRepository>();
 builder.Services.AddScoped<IUserRepository, EFCoreUserRepository>();
 
-// CORS Configuration (if needed for frontend integration)
+// CORS Configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        args =>
-        {
-            args.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowRenderApp", policy =>
+    {
+        policy.WithOrigins(
+                "https://quantitymeasurementapp-frontend-2abn.onrender.com",
+                "http://localhost:4200" // Local Angular dev server
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
 });
 
 var app = builder.Build();
 
-// Note: Database migrations are managed separately via: dotnet ef database update
-// The QuantityMeasurementDB database with QuantityMeasurements table should already exist
+// Automatically perform database migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        // Log the error (you might want to use a logger here)
+        Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+    }
+}
 
 // Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
@@ -103,7 +134,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowRenderApp");
 
 // Global Exception Handler Middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();

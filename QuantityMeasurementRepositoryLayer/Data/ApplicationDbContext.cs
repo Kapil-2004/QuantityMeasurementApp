@@ -39,8 +39,7 @@ namespace QuantityMeasurementRepositoryLayer.Data
                     new ValueComparer<QuantityModel<object>>(
                         (c1, c2) => c1.Value == c2.Value && c1.Unit.Equals(c2.Unit),
                         c => HashCode.Combine(c.Value, c.Unit),
-                        c => new QuantityModel<object>(c.Value, c.Unit)))
-                .HasColumnType("nvarchar(max)");
+                        c => new QuantityModel<object>(c.Value, c.Unit)));
 
             entityBuilder.Property(e => e.Operand2)
                 .HasConversion(
@@ -49,8 +48,7 @@ namespace QuantityMeasurementRepositoryLayer.Data
                     new ValueComparer<QuantityModel<object>>(
                         (c1, c2) => c1.Value == c2.Value && c1.Unit.Equals(c2.Unit),
                         c => HashCode.Combine(c.Value, c.Unit),
-                        c => new QuantityModel<object>(c.Value, c.Unit)))
-                .HasColumnType("nvarchar(max)");
+                        c => new QuantityModel<object>(c.Value, c.Unit)));
 
             entityBuilder.Property(e => e.Result)
                 .HasConversion(
@@ -59,8 +57,7 @@ namespace QuantityMeasurementRepositoryLayer.Data
                     new ValueComparer<object>(
                         (c1, c2) => c1.Equals(c2),
                         c => c.GetHashCode(),
-                        c => c))
-                .HasColumnType("nvarchar(max)");
+                        c => c));
 
             entityBuilder.Property(e => e.Operation)
                 .HasConversion(new EnumToStringConverter<QuantityMeasurementModelLayer.Enums.OperationType>())

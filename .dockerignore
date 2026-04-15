@@ -1,0 +1,15 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/*.user
+**/*.lock.json
+Dockerfile
+.dockerignore
+.gitignore
+README.md
+*.sln
+*.slnx
+QuantityMeasurementApp.Tests/
+QuantityMeasurementDB/
