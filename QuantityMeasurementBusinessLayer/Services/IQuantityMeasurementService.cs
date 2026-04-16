@@ -6,15 +6,15 @@ namespace QuantityMeasurementBusinessLayer.Services
 {
     public interface IQuantityMeasurementService
     {
-        bool Compare(QuantityDTO q1, QuantityDTO q2);
+        bool Compare(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false);
 
-        QuantityDTO Convert(QuantityDTO input, string targetUnit);
+        QuantityDTO Convert(QuantityDTO input, string targetUnit, bool saveHistory = false);
 
-        QuantityDTO Add(QuantityDTO q1, QuantityDTO q2);
+        QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false);
 
-        QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2);
+        QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false);
 
-        double Divide(QuantityDTO q1, QuantityDTO q2);
+        double Divide(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false);
 
         List<QuantityMeasurementEntity> GetHistory();
     }

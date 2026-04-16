@@ -47,7 +47,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            bool result = _service.Compare(q1Dto, q2Dto);
+            bool result = _service.Compare(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
 
             var response = new ComparisonResponse
             {
@@ -76,7 +76,7 @@ namespace QuantityMeasurementAPI.Controllers
             _logger.LogInformation("Convert operation called");
 
             var quantityDto = new QuantityDTO(request.Quantity.Value, request.Quantity.Unit, request.Quantity.MeasurementType);
-            var convertedQuantity = _service.Convert(quantityDto, request.TargetUnit);
+            var convertedQuantity = _service.Convert(quantityDto, request.TargetUnit, saveHistory: User.Identity?.IsAuthenticated ?? false);
 
             var response = new ConversionResponse
             {
@@ -108,7 +108,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            var result = _service.Add(q1Dto, q2Dto);
+            var result = _service.Add(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
 
             var response = new ArithmeticOperationResponse
             {
@@ -140,7 +140,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            var result = _service.Subtract(q1Dto, q2Dto);
+            var result = _service.Subtract(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
 
             var response = new ArithmeticOperationResponse
             {
@@ -172,7 +172,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            double result = _service.Divide(q1Dto, q2Dto);
+            double result = _service.Divide(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
 
             var response = new DivisionResponse
             {

@@ -55,7 +55,7 @@ namespace QuantityMeasurementBusinessLayer.Services
             return new QuantityModel<object>(dto.Value, unitEnum);
         }
 
-        public bool Compare(QuantityDTO q1, QuantityDTO q2)
+        public bool Compare(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false)
         {
             if (q1.MeasurementType != q2.MeasurementType)
                 throw new QuantityMeasurementException("Cannot compare different measurement types");
@@ -65,16 +65,19 @@ namespace QuantityMeasurementBusinessLayer.Services
 
             bool result = base1 == base2;
 
-            var entity = new QuantityMeasurementEntity(result);
-            entity.Operation = OperationType.Compare;
-            entity.Operand1 = MapToEntityModel(q1);
-            entity.Operand2 = MapToEntityModel(q2);
-            repository.Save(entity);
+            if (saveHistory)
+            {
+                var entity = new QuantityMeasurementEntity(result);
+                entity.Operation = OperationType.Compare;
+                entity.Operand1 = MapToEntityModel(q1);
+                entity.Operand2 = MapToEntityModel(q2);
+                repository.Save(entity);
+            }
 
             return result;
         }
 
-        public QuantityDTO Convert(QuantityDTO input, string targetUnit)
+        public QuantityDTO Convert(QuantityDTO input, string targetUnit, bool saveHistory = false)
         {
             double baseValue = ConvertToBase(input);
 
@@ -82,16 +85,19 @@ namespace QuantityMeasurementBusinessLayer.Services
 
             var result = new QuantityDTO(convertedValue, targetUnit, input.MeasurementType);
 
-            var entity = new QuantityMeasurementEntity(result);
-            entity.Operation = OperationType.Convert;
-            entity.Operand1 = MapToEntityModel(input);
-            entity.Operand2 = new QuantityModel<object>(0, MapToEntityModel(new QuantityDTO(0, targetUnit, input.MeasurementType)).Unit);
-            repository.Save(entity);
+            if (saveHistory)
+            {
+                var entity = new QuantityMeasurementEntity(result);
+                entity.Operation = OperationType.Convert;
+                entity.Operand1 = MapToEntityModel(input);
+                entity.Operand2 = new QuantityModel<object>(0, MapToEntityModel(new QuantityDTO(0, targetUnit, input.MeasurementType)).Unit);
+                repository.Save(entity);
+            }
 
             return result;
         }
 
-        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2)
+        public QuantityDTO Add(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false)
         {
             if (q1.MeasurementType != q2.MeasurementType)
                 throw new QuantityMeasurementException("Cannot add different measurement types");
@@ -108,16 +114,19 @@ namespace QuantityMeasurementBusinessLayer.Services
 
             var result = new QuantityDTO(resultValue, q1.Unit, q1.MeasurementType);
 
-            var entity = new QuantityMeasurementEntity(result);
-            entity.Operation = OperationType.Add;
-            entity.Operand1 = MapToEntityModel(q1);
-            entity.Operand2 = MapToEntityModel(q2);
-            repository.Save(entity);
+            if (saveHistory)
+            {
+                var entity = new QuantityMeasurementEntity(result);
+                entity.Operation = OperationType.Add;
+                entity.Operand1 = MapToEntityModel(q1);
+                entity.Operand2 = MapToEntityModel(q2);
+                repository.Save(entity);
+            }
 
             return result;
         }
 
-        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2)
+        public QuantityDTO Subtract(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false)
         {
             if (q1.MeasurementType != q2.MeasurementType)
                 throw new QuantityMeasurementException("Cannot subtract different measurement types");
@@ -134,16 +143,19 @@ namespace QuantityMeasurementBusinessLayer.Services
 
             var result = new QuantityDTO(resultValue, q1.Unit, q1.MeasurementType);
 
-            var entity = new QuantityMeasurementEntity(result);
-            entity.Operation = OperationType.Subtract;
-            entity.Operand1 = MapToEntityModel(q1);
-            entity.Operand2 = MapToEntityModel(q2);
-            repository.Save(entity);
+            if (saveHistory)
+            {
+                var entity = new QuantityMeasurementEntity(result);
+                entity.Operation = OperationType.Subtract;
+                entity.Operand1 = MapToEntityModel(q1);
+                entity.Operand2 = MapToEntityModel(q2);
+                repository.Save(entity);
+            }
 
             return result;
         }
 
-        public double Divide(QuantityDTO q1, QuantityDTO q2)
+        public double Divide(QuantityDTO q1, QuantityDTO q2, bool saveHistory = false)
         {
             if (q1.MeasurementType != q2.MeasurementType)
                 throw new QuantityMeasurementException("Cannot divide different measurement types");
@@ -159,11 +171,14 @@ namespace QuantityMeasurementBusinessLayer.Services
 
             double result = base1 / base2;
 
-            var entity = new QuantityMeasurementEntity(result);
-            entity.Operation = OperationType.Divide;
-            entity.Operand1 = MapToEntityModel(q1);
-            entity.Operand2 = MapToEntityModel(q2);
-            repository.Save(entity);
+            if (saveHistory)
+            {
+                var entity = new QuantityMeasurementEntity(result);
+                entity.Operation = OperationType.Divide;
+                entity.Operand1 = MapToEntityModel(q1);
+                entity.Operand2 = MapToEntityModel(q2);
+                repository.Save(entity);
+            }
 
             return result;
         }
