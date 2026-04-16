@@ -35,6 +35,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Comparison successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
+        [AllowAnonymous]
         [HttpPost("compare")]
         [ProducesResponseType(typeof(ApiResponse<ComparisonResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -65,6 +66,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Conversion successful</response>
         /// <response code="400">Invalid input or unit not supported</response>
         /// <response code="500">Internal server error</response>
+        [AllowAnonymous]
         [HttpPost("convert")]
         [ProducesResponseType(typeof(ApiResponse<ConversionResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -94,6 +96,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Addition successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
+        [AllowAnonymous]
         [HttpPost("add")]
         [ProducesResponseType(typeof(ApiResponse<ArithmeticOperationResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -125,6 +128,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Subtraction successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
+        [AllowAnonymous]
         [HttpPost("subtract")]
         [ProducesResponseType(typeof(ApiResponse<ArithmeticOperationResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -156,6 +160,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Division successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
+        [AllowAnonymous]
         [HttpPost("divide")]
         [ProducesResponseType(typeof(ApiResponse<DivisionResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -234,6 +239,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// Health check endpoint
         /// </summary>
         /// <returns>API status</returns>
+        [AllowAnonymous]
         [HttpGet("health")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult HealthCheck()
