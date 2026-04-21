@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for Auth Service
+  auth-db:
+    image: postgres:15-alpine
+    container_name: quantity_measurement_auth_db
+    environment:
+      POSTGRES_DB: quantity_measurement_auth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: QuantityMeasurement.AuthService/Dockerfile
+    container_name: quantity_auth_service
+    ports:
+      - "5001:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DATABASE_URL: postgresql://postgres:postgres@auth-db:5432/quantity_measurement_auth
+      Jwt__Key: your-super-secret-key-change-this-in-production-1234567890
+      Jwt__Issuer: QuantityMeasurementApp
+      Jwt__Audience: QuantityMeasurementAppUsers
+      Jwt__DurationInMinutes: "60"
+      Authentication__Google__ClientId: "your-google-client-id"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Compare Service
+  compare-service:
+    build:
+      context: .
+      dockerfile: QuantityMeasurement.CompareService/Dockerfile
+    container_name: quantity_compare_service
+    ports:
+      - "5002:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Convert Service
+  convert-service:
+    build:
+      context: .
+      dockerfile: QuantityMeasurement.ConvertService/Dockerfile
+    container_name: quantity_convert_service
+    ports:
+      - "5003:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Arithmetic Service
+  arithmetic-service:
+    build:
+      context: .
+      dockerfile: QuantityMeasurement.ArithmeticService/Dockerfile
+    container_name: quantity_arithmetic_service
+    ports:
+      - "5004:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: QuantityMeasurement.ApiGateway/Dockerfile
+    container_name: quantity_api_gateway
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Jwt__Key: your-super-secret-key-change-this-in-production-1234567890
+      Jwt__Issuer: QuantityMeasurementApp
+      Jwt__Audience: QuantityMeasurementAppUsers
+      Services__AuthService__Url: http://auth-service:8080
+      Services__CompareService__Url: http://compare-service:8080
+      Services__ConvertService__Url: http://convert-service:8080
+      Services__ArithmeticService__Url: http://arithmetic-service:8080
+    depends_on:
+      - auth-service
+      - compare-service
+      - convert-service
+      - arithmetic-service
+    networks:
+      - quantity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/index.html"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  auth_db_data:
+
+networks:
+  quantity-network:
+    driver: bridge
