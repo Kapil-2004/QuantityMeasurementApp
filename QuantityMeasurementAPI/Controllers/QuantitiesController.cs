@@ -12,7 +12,6 @@ namespace QuantityMeasurementAPI.Controllers
     /// Quantity Measurement API Controller
     /// Handles all measurement operations via REST API endpoints
     /// </summary>
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -35,7 +34,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Comparison successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
-        [AllowAnonymous]
         [HttpPost("compare")]
         [ProducesResponseType(typeof(ApiResponse<ComparisonResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -47,7 +45,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            bool result = _service.Compare(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
+            bool result = _service.Compare(q1Dto, q2Dto);
 
             var response = new ComparisonResponse
             {
@@ -66,7 +64,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Conversion successful</response>
         /// <response code="400">Invalid input or unit not supported</response>
         /// <response code="500">Internal server error</response>
-        [AllowAnonymous]
         [HttpPost("convert")]
         [ProducesResponseType(typeof(ApiResponse<ConversionResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -76,7 +73,7 @@ namespace QuantityMeasurementAPI.Controllers
             _logger.LogInformation("Convert operation called");
 
             var quantityDto = new QuantityDTO(request.Quantity.Value, request.Quantity.Unit, request.Quantity.MeasurementType);
-            var convertedQuantity = _service.Convert(quantityDto, request.TargetUnit, saveHistory: User.Identity?.IsAuthenticated ?? false);
+            var convertedQuantity = _service.Convert(quantityDto, request.TargetUnit);
 
             var response = new ConversionResponse
             {
@@ -96,7 +93,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Addition successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
-        [AllowAnonymous]
         [HttpPost("add")]
         [ProducesResponseType(typeof(ApiResponse<ArithmeticOperationResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -108,7 +104,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            var result = _service.Add(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
+            var result = _service.Add(q1Dto, q2Dto);
 
             var response = new ArithmeticOperationResponse
             {
@@ -128,7 +124,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Subtraction successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
-        [AllowAnonymous]
         [HttpPost("subtract")]
         [ProducesResponseType(typeof(ApiResponse<ArithmeticOperationResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -140,7 +135,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            var result = _service.Subtract(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
+            var result = _service.Subtract(q1Dto, q2Dto);
 
             var response = new ArithmeticOperationResponse
             {
@@ -160,7 +155,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// <response code="200">Division successful</response>
         /// <response code="400">Invalid input or measurement type mismatch</response>
         /// <response code="500">Internal server error</response>
-        [AllowAnonymous]
         [HttpPost("divide")]
         [ProducesResponseType(typeof(ApiResponse<DivisionResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -172,7 +166,7 @@ namespace QuantityMeasurementAPI.Controllers
             var q1Dto = new QuantityDTO(request.Q1.Value, request.Q1.Unit, request.Q1.MeasurementType);
             var q2Dto = new QuantityDTO(request.Q2.Value, request.Q2.Unit, request.Q2.MeasurementType);
 
-            double result = _service.Divide(q1Dto, q2Dto, saveHistory: User.Identity?.IsAuthenticated ?? false);
+            double result = _service.Divide(q1Dto, q2Dto);
 
             var response = new DivisionResponse
             {
@@ -188,6 +182,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <returns>List of all measurement operations</returns>
         /// <response code="200">History retrieved successfully</response>
         /// <response code="500">Internal server error</response>
+        [Authorize]
         [HttpGet("history")]
         [ProducesResponseType(typeof(ApiResponse<List<OperationHistoryResponse>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -218,6 +213,7 @@ namespace QuantityMeasurementAPI.Controllers
         /// <returns>Number of operations performed</returns>
         /// <response code="200">Count retrieved successfully</response>
         /// <response code="500">Internal server error</response>
+        [Authorize]
         [HttpGet("count")]
         [ProducesResponseType(typeof(ApiResponse<CountResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -239,7 +235,6 @@ namespace QuantityMeasurementAPI.Controllers
         /// Health check endpoint
         /// </summary>
         /// <returns>API status</returns>
-        [AllowAnonymous]
         [HttpGet("health")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult HealthCheck()
